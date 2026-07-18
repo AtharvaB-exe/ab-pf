@@ -5,19 +5,29 @@ export default function App() {
     <>
       <FluidBlobCursor />
 
-      <main className="min-h-screen bg-black text-white overflow-hidden">
+      <main className="min-h-screen text-white overflow-hidden">
 
-        <section className="relative h-screen flex items-center justify-center">
+        {/* Background */}
+        <div
+          className="fixed inset-0 bg-cover bg-center"
+          style={{
+            backgroundImage: "url('/bg.png')",
+          }}
+        />
 
-          <div className="absolute inset-0 bg-gradient-to-b from-black via-zinc-950 to-black" />
+        {/* Dark Overlay */}
+        <div className="fixed inset-0 bg-black/50" />
 
-          <div className="relative z-10 max-w-7xl px-10 w-full">
+        {/* Hero */}
+        <section className="relative h-screen flex items-center">
+
+          <div className="relative z-10 max-w-7xl mx-auto px-10 w-full">
 
             <p
               className="
-              text-cyan-400
+              text-cyan-300
               uppercase
-              tracking-[0.4em]
+              tracking-[0.45em]
               text-sm
               mb-8
               "
@@ -51,7 +61,7 @@ export default function App() {
               className="
               mt-10
               max-w-2xl
-              text-zinc-400
+              text-zinc-300
               text-xl
               "
             >
@@ -66,12 +76,12 @@ export default function App() {
               py-4
               rounded-full
               border
-              border-white/15
-              bg-white/5
-              backdrop-blur-xl
+              border-white/20
+              bg-white/10
+              backdrop-blur-3xl
               transition-all
               duration-500
-              hover:bg-white/10
+              hover:bg-white/20
               "
             >
               Explore Work

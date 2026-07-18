@@ -10,44 +10,29 @@ export default function FluidBlobCursor() {
     let currentX = mouseX;
     let currentY = mouseY;
 
-    let velocityX = 0;
-    let velocityY = 0;
-
-    const move = (e) => {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
-    };
-
-    window.addEventListener("mousemove", move);
-
     const animate = () => {
       currentX += (mouseX - currentX) * 0.12;
       currentY += (mouseY - currentY) * 0.12;
 
-      velocityX = mouseX - currentX;
-      velocityY = mouseY - currentY;
+      const dx = mouseX - currentX;
+      const dy = mouseY - currentY;
 
       const speed = Math.min(
-        Math.sqrt(
-          velocityX * velocityX +
-          velocityY * velocityY
-        ) * 0.4,
-        35
+        Math.sqrt(dx * dx + dy * dy),
+        60
       );
 
-      const stretch = 1 + speed / 35;
+      const stretch = 1 + speed * 0.015;
 
       const angle =
-        Math.atan2(
-          velocityY,
-          velocityX
-        ) * (180 / Math.PI);
+        Math.atan2(dy, dx) *
+        (180 / Math.PI);
 
       if (blobRef.current) {
         blobRef.current.style.transform = `
           translate(
-            ${currentX - 35}px,
-            ${currentY - 35}px
+            ${currentX - 45}px,
+            ${currentY - 45}px
           )
           rotate(${angle}deg)
           scale(${stretch}, ${1 / stretch})
@@ -57,13 +42,17 @@ export default function FluidBlobCursor() {
       requestAnimationFrame(animate);
     };
 
+    const move = (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+    };
+
+    window.addEventListener("mousemove", move);
+
     animate();
 
     return () => {
-      window.removeEventListener(
-        "mousemove",
-        move
-      );
+      window.removeEventListener("mousemove", move);
     };
   }, []);
 
