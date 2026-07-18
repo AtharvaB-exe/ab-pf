@@ -1,48 +1,40 @@
+import Cursor from "./components/Cursor";
+
 export default function App() {
   return (
-    <main>
+    <>
+      <Cursor />
 
-      <section className="hero">
-        <div className="hero-content">
+      <main>
 
-          <p className="eyebrow">
-            UI/UX DESIGNER • FRONTEND DEVELOPER
-          </p>
+        <section className="hero">
 
-          <h1>
-            ATHARVA
-            <br />
-            BULBULE
-          </h1>
+          <div className="hero-content">
 
-          <p className="description">
-            Crafting cinematic digital experiences through design,
-            code and visual storytelling.
-          </p>
+            <p className="eyebrow">
+              UI/UX DESIGNER • FRONTEND DEVELOPER
+            </p>
 
-          <button>
-            Explore Work
-          </button>
+            <h1>
+              ATHARVA
+              <br />
+              BULBULE
+            </h1>
 
-        </div>
-      </section>
+            <p className="description">
+              Crafting cinematic digital experiences through
+              design, code and visual storytelling.
+            </p>
 
-      <section className="placeholder">
-        About
-      </section>
+            <button className="glass-btn">
+              Explore Work
+            </button>
 
-      <section className="placeholder">
-        Projects
-      </section>
+          </div>
 
-      <section className="placeholder">
-        Skills
-      </section>
+        </section>
 
-      <section className="placeholder">
-        Contact
-      </section>
-
-    </main>
+      </main>
+    </>
   );
 }
