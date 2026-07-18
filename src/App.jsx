@@ -1,13 +1,12 @@
-import LiquidCursor from "./components/LiquidCursor";
+import FluidBlobCursor from "./components/FluidBlobCursor";
 
 export default function App() {
   return (
     <>
-      <LiquidCursor />
+      <FluidBlobCursor />
 
       <main className="min-h-screen bg-black text-white overflow-hidden">
 
-        {/* HERO */}
         <section className="relative h-screen flex items-center justify-center">
 
           <div className="absolute inset-0 bg-gradient-to-b from-black via-zinc-950 to-black" />
@@ -66,13 +65,13 @@ export default function App() {
               px-8
               py-4
               rounded-full
-              bg-white/10
-              backdrop-blur-xl
               border
-              border-white/20
-              hover:bg-white/20
+              border-white/15
+              bg-white/5
+              backdrop-blur-xl
               transition-all
               duration-500
+              hover:bg-white/10
               "
             >
               Explore Work
