@@ -18,7 +18,7 @@ body {
   cursor: none !important;
 }
 
-/* ===== iOS STYLE MAPPING & BLUR ENGINE ===== */
+/* ===== iOS LIQUID GLASS WITH ULTRA-BLURRED MISTY EDGES ===== */
 
 .fluid-cursor-system {
   position: fixed;
@@ -31,48 +31,42 @@ body {
   position: absolute;
   top: 0;
   left: 0;
-  width: 140px;
-  height: 140px;
+  width: 150px;
+  height: 150px;
   pointer-events: none;
   will-change: transform, border-radius;
   
-  /* Heavy glass dynamic distortion */
-  backdrop-filter: blur(20px) saturate(210%) contrast(100%);
-  -webkit-backdrop-filter: blur(20px) saturate(210%) contrast(100%);
+  /* Deep crystal iOS refraction inside the blob core */
+  backdrop-filter: blur(28px) saturate(230%) contrast(105%);
+  -webkit-backdrop-filter: blur(28px) saturate(230%) contrast(105%);
   
-  /* Transparent central core */
+  /* NO borders, NO drop shadows. The edge is purely softened via feather filter */
+  filter: blur(8px); 
+  
+  /* Highly transparent glass core gradient */
   background: radial-gradient(
     circle at 35% 35%,
-    rgba(255, 255, 255, 0.12) 0%,
-    rgba(255, 255, 255, 0.02) 60%,
-    rgba(255, 255, 255, 0) 100%
+    rgba(255, 255, 255, 0.16) 0%,
+    rgba(255, 255, 255, 0.04) 45%,
+    rgba(255, 255, 255, 0) 70%
   );
   
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  
+  /* Subtle inner glass light dispersion */
   box-shadow: 
-    inset 0 6px 14px rgba(255, 255, 255, 0.25),
-    inset 0 -8px 20px rgba(255, 255, 255, 0.02),
-    0 15px 35px rgba(0, 0, 0, 0.3);
+    inset 0 8px 20px rgba(255, 255, 255, 0.2),
+    inset 0 -8px 25px rgba(255, 255, 255, 0.02);
 }
 
+/* Internal glossy reflection hotspots */
 .specular-lens-reflection {
   position: absolute;
-  inset: 6px;
+  inset: 12px;
   border-radius: inherit;
   background: radial-gradient(
-    circle at 25% 25%,
-    rgba(255, 255, 255, 0.6) 0%,
+    circle at 28% 28%,
+    rgba(255, 255, 255, 0.5) 0%,
     rgba(255, 255, 255, 0) 60%
   );
-  filter: blur(3px);
-  opacity: 0.85;
-}
-
-.rim-light-accent {
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: linear-gradient(315deg, rgba(255, 255, 255, 0.08), transparent 50%);
-  mix-blend-mode: overlay;
+  filter: blur(4px);
+  opacity: 0.8;
 }
