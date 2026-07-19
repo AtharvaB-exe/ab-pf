@@ -7,8 +7,7 @@ import {
   useGLTF,
   Preload,
   MeshTransmissionMaterial,
-  Image,
-  Text
+  Image
 } from '@react-three/drei';
 import { easing } from 'maath';
 
@@ -19,7 +18,7 @@ export default function FluidGlass({ mode = 'lens', lensProps = {} }) {
   return (
     <Canvas camera={{ position: [0, 0, 20], fov: 15 }} gl={{ alpha: true }}>
       <Wrapper modeProps={rawOverrides}>
-        <SceneContent />
+        <RefractionSceneTarget />
         <Preload />
       </Wrapper>
     </Canvas>
@@ -39,7 +38,10 @@ const ModeWrapper = memo(function ModeWrapper({
   const { nodes } = useGLTF(glb);
   const buffer = useFBO();
   const { viewport: vp } = useThree();
-  const [scene] = useState(() => new THREE.Scene());
+  const [scene] = useState(() => {
+    const s = new THREE.Scene();
+    return s;
+  });
   const geoWidthRef = useRef(1);
 
   useEffect(() => {
@@ -67,6 +69,7 @@ const ModeWrapper = memo(function ModeWrapper({
       }
     }
 
+    // Capture the internal scene textures into the offscreen FBO buffer
     gl.setRenderTarget(buffer);
     gl.render(scene, camera);
     gl.setRenderTarget(null);
@@ -77,20 +80,25 @@ const ModeWrapper = memo(function ModeWrapper({
   return (
     <>
       {createPortal(children, scene)}
+      
+      {/* 1. Underlying main base texture pass to make sure the glass has data to distort */}
       <mesh scale={[vp.width, vp.height, 1]}>
         <planeGeometry />
-        <meshBasicMaterial map={buffer.texture} transparent />
+        <meshBasicMaterial map={buffer.texture} transparent opacity={1} />
       </mesh>
+      
+      {/* 2. The physical floating glass lens geometry mesh */}
       {nodes[geometryKey] && (
         <mesh ref={ref} scale={scale ?? 0.24} rotation-x={Math.PI / 2} geometry={nodes[geometryKey].geometry} {...props}>
           <MeshTransmissionMaterial
             buffer={buffer.texture}
-            ior={ior ?? 1.22}
-            thickness={thickness ?? 5.5}
-            anisotropy={anisotropy ?? 0.03}
-            chromaticAberration={chromaticAberration ?? 0.14}
+            ior={ior ?? 1.2}
+            thickness={thickness ?? 5}
+            anisotropy={anisotropy ?? 0.02}
+            chromaticAberration={chromaticAberration ?? 0.12}
             transmission={1}
             roughness={0.0}
+            transparent
             {...extraMat}
           />
         </mesh>
@@ -112,72 +120,8 @@ function Bar({ modeProps = {}, ...p }) {
   return <ModeWrapper glb="/assets/3d/bar.glb" geometryKey="Cube" lockToBottom followPointer={false} modeProps={{ ...defaultMat, ...modeProps }} {...p} />;
 }
 
-// 3D Visual Tree containing background + text structures inside the render target buffer
-function SceneContent() {
+// Internal target engine: This provides the visual matrix texture data exclusively for the lens to refract
+function RefractionSceneTarget() {
   const { width, height } = useThree((state) => state.viewport);
-
-  // Dynamic responsive sizing calculation weights based on screen size properties
-  const isMobile = window.innerWidth < 768;
-  const headlineSize = isMobile ? height * 0.11 : height * 0.14;
-  const startX = isMobile ? -width * 0.42 : -width * 0.38;
-
-  return (
-    <group>
-      {/* 3D Core Layer Background Texture */}
-      <Image position={[0, 0, 0]} scale={[width, height, 1]} url="/bg.png" />
-
-      {/* Sub-Headline Text Element */}
-      <Text
-        position={[startX, height * 0.22, 2]}
-        fontSize={height * 0.02}
-        font="https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuGdfAZ9hiA.woff2"
-        color="#22d3ee"
-        anchorX="left"
-        anchorY="middle"
-        letterSpacing={0.4}
-      >
-        UI/UX DESIGNER • FRONTEND DEVELOPER
-      </Text>
-
-      {/* Main Headline Stack: Row 1 */}
-      <Text
-        position={[startX, height * 0.08, 2]}
-        fontSize={headlineSize}
-        font="https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuGdfAZ9hiA.woff2"
-        color="white"
-        anchorX="left"
-        anchorY="middle"
-        letterSpacing={-0.04}
-      >
-        ATHARVA
-      </Text>
-
-      {/* Main Headline Stack: Row 2 */}
-      <Text
-        position={[startX, -height * 0.06, 2]}
-        fontSize={headlineSize}
-        font="https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuGdfAZ9hiA.woff2"
-        color="white"
-        anchorX="left"
-        anchorY="middle"
-        letterSpacing={-0.04}
-      >
-        BULBULE
-      </Text>
-
-      {/* Paragraph Core Summary Text Section */}
-      <Text
-        position={[startX, -height * 0.18, 2]}
-        fontSize={height * 0.026}
-        font="https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2"
-        color="#d4d4d8"
-        anchorX="left"
-        anchorY="top"
-        maxWidth={isMobile ? width * 0.85 : width * 0.45}
-        lineHeight={1.4}
-      >
-        Crafting cinematic digital experiences through design, code, and visual storytelling.
-      </Text>
-    </group>
-  );
+  return <Image position={[0, 0, 0]} scale={[width, height, 1]} url="/bg.png" />;
 }
