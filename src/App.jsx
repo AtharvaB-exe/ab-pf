@@ -1,13 +1,96 @@
-import FluidBlobCursor from "./components/FluidBlobCursor";
+import { useEffect, useRef } from "react";
+
+// Self-contained custom liquid glass pointer engine
+function FluidBlobCursor() {
+  const blobRef = useRef(null);
+
+  useEffect(() => {
+    let mouseX = window.innerWidth / 2;
+    let mouseY = window.innerHeight / 2;
+    let currentX = mouseX;
+    let currentY = mouseY;
+    
+    let velX = 0;
+    let velY = 0;
+    
+    const friction = 0.92; 
+    const acceleration = 0.03; 
+    let time = 0;
+
+    const handleMouseMove = (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+
+    const updateFluidPhysics = () => {
+      time += 0.015;
+
+      const dx = mouseX - currentX;
+      const dy = mouseY - currentY;
+
+      velX += dx * acceleration;
+      velY += dy * acceleration;
+      
+      velX *= friction;
+      velY *= friction;
+
+      currentX += velX;
+      currentY += velY;
+
+      const speed = Math.sqrt(velX * velX + velY * velY);
+      const stretch = Math.min(speed * 0.008, 0.35);
+      
+      const scaleX = 1 + stretch;
+      const scaleY = 1 - stretch * 0.4;
+      
+      let angle = 0;
+      if (speed > 0.1) {
+        angle = Math.atan2(velY, velX) * (180 / Math.PI);
+      }
+
+      const r1 = 47 + Math.sin(time) * 3;
+      const r2 = 53 + Math.cos(time + 1) * 3;
+      const r3 = 52 + Math.sin(time + 2) * 3;
+      const r4 = 48 + Math.cos(time + 3) * 3;
+
+      if (blobRef.current) {
+        blobRef.current.style.borderRadius = `${r1}% ${100-r1}% ${r2}% ${100-r2}% / ${r3}% ${r4}% ${100-r4}% ${100-r3}%`;
+        blobRef.current.style.transform = `
+          translate3d(${currentX}px, ${currentY}px, 0)
+          translate(-50%, -50%)
+          rotate(${angle}deg)
+          scale(${scaleX}, ${scaleY})
+        `;
+      }
+
+      requestAnimationFrame(updateFluidPhysics);
+    };
+
+    const animFrame = requestAnimationFrame(updateFluidPhysics);
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      cancelAnimationFrame(animFrame);
+    };
+  }, []);
+
+  return (
+    <div className="fluid-cursor-system">
+      <div ref={blobRef} className="ios-glass-droplet" />
+    </div>
+  );
+}
 
 export default function App() {
   return (
     <div className="relative w-full min-h-screen bg-[#050505] text-white selection:bg-white/25 overflow-x-hidden">
       
-      {/* 1. Flawless Liquid Glass Physics Engine Pointer */}
+      {/* 1. Integrated Fluid Glass Pointer */}
       <FluidBlobCursor />
 
-      {/* 2. Your Background Image Layer (Pulled directly from public/bg.png) */}
+      {/* 2. Background Asset Layer */}
       <div
         className="fixed inset-0 bg-cover bg-center transform scale-100 pointer-events-none z-0"
         style={{
@@ -15,10 +98,10 @@ export default function App() {
         }}
       />
 
-      {/* 3. Dark Cinematic Vignette Ambient Overlay */}
+      {/* 3. Dark Atmospheric Environmental Overlay */}
       <div className="fixed inset-0 z-10 bg-gradient-to-b from-black/40 via-transparent to-black/60 pointer-events-none" />
 
-      {/* 4. Main HTML Typographic Layout Interface Sheet */}
+      {/* 4. Typographic Workspace Interface Layout */}
       <main className="relative z-20 min-h-screen flex items-center">
         <div className="max-w-7xl mx-auto px-8 md:px-16 w-full py-20">
           
