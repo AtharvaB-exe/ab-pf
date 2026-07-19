@@ -37,7 +37,7 @@ export default function App() {
   return (
     <div className="relative w-full h-screen bg-[#050505] overflow-hidden font-sans cursor-none select-none">
       
-      {/* Precision Dynamic Cursor Dot */}
+      {/* Custom Dynamic Cursor Tracking Ring */}
       <div 
         className="fixed w-2 h-2 bg-cyan-400 rounded-full pointer-events-none z-50 shadow-[0_0_10px_#22d3ee] -translate-x-1/2 -translate-y-1/2 transition-all duration-75 ease-out"
         style={{ left: `${rawCursor.x}px`, top: `${rawCursor.y}px` }}
@@ -47,16 +47,16 @@ export default function App() {
         style={{ left: `${rawCursor.x}px`, top: `${rawCursor.y}px` }}
       />
 
-      {/* Underlying Base Background Layer */}
+      {/* Underlying Base Background Canvas Layer */}
       <div
-        className="absolute inset-0 bg-cover bg-center pointer-events-none z-0 opacity-40 mix-blend-screen"
+        className="absolute inset-0 bg-cover bg-center pointer-events-none z-0 opacity-40 mix-blend-screen animate-fade-in"
         style={{ backgroundImage: "url('/bg.png')" }}
       />
 
-      {/* Ambient Lighting Vignette */}
+      {/* Ambient Lighting Vignette overlay */}
       <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/20 via-transparent to-black/50 pointer-events-none" />
 
-      {/* 3D WebGL Fluid Lens Canvas layer */}
+      {/* 3D WebGL Fluid Lens Layer */}
       {!isEntered && (
         <div className="absolute inset-0 z-20 w-full h-full pointer-events-none">
           <FluidGlass 
@@ -74,27 +74,31 @@ export default function App() {
         </div>
       )}
 
-      {/* HTML Core Page Elements Structure Layout */}
+      {/* Main Container Viewport centering layout sheet */}
       <main ref={htmlContentRef} className="absolute inset-0 z-30 min-h-screen flex items-center justify-center transition-all duration-700">
         
         {!isEntered ? (
-          /* ================= LANDING SCREEN ================= */
-          <div className="max-w-7xl mx-auto px-8 md:px-16 w-full py-20 text-white flex flex-col items-center justify-center animate-fade-in">
+          /* ================= MAIN LANDING SCREEN STAGE ================= */
+          <div className="w-full flex flex-col items-center justify-center text-center text-white px-4 md:px-16 animate-fade-in">
             
-            {/* Real Interactive Typography Container */}
-            <div className="text-center mb-6 relative z-40">
-              <p className="text-cyan-400 uppercase tracking-[0.5em] text-xs font-bold mb-6">
+            {/* The beautiful hero titles centered on screen */}
+            <div className="flex flex-col items-center justify-center text-center">
+              <p className="text-cyan-400 uppercase tracking-[0.5em] text-xs md:text-sm font-bold mb-6">
                 UI/UX DESIGNER • FRONTEND DEVELOPER
               </p>
-              <h1 className="text-[11vw] font-black leading-[0.85] tracking-tighter uppercase text-white">ATHARVA</h1>
-              <h1 className="text-[11vw] font-black leading-[0.85] tracking-tighter uppercase text-white mb-8">BULBULE</h1>
-              <p className="max-w-xl text-zinc-200 text-lg md:text-xl font-medium leading-relaxed mx-auto">
+              <h1 className="text-[11vw] font-black leading-[0.85] tracking-tighter uppercase text-white select-none">
+                ATHARVA
+              </h1>
+              <h1 className="text-[11vw] font-black leading-[0.85] tracking-tighter uppercase text-white mb-8 select-none">
+                BULBULE
+              </h1>
+              <p className="max-w-xl text-zinc-200 text-lg md:text-xl font-medium leading-relaxed mx-auto select-none">
                 Crafting cinematic digital experiences through design, code, and visual storytelling.
               </p>
             </div>
 
-            {/* Glowing Custom Enter Button Container */}
-            <div className="mt-14 pointer-events-auto relative z-50">
+            {/* Glowing Interactive Custom Enter Button */}
+            <div className="mt-12 pointer-events-auto relative z-50">
               <BorderGlow
                 edgeSensitivity={40}
                 glowColor="190 90% 60%"
@@ -109,13 +113,14 @@ export default function App() {
               >
                 <button 
                   onClick={() => setIsEntered(true)}
-                  className="px-10 py-4 bg-transparent text-sm font-semibold tracking-wider text-white select-none border border-transparent rounded-full focus:outline-none cursor-none"
-                  style={{ minWidth: '150px', minHeight: '48px' }}
+                  className="px-12 py-4 bg-transparent text-sm font-semibold tracking-widest text-white select-none border border-transparent rounded-full focus:outline-none cursor-none uppercase"
+                  style={{ minWidth: '160px', minHeight: '52px' }}
                 >
                   Enter
                 </button>
               </BorderGlow>
             </div>
+
           </div>
         ) : (
           /* ================= MAIN PROFILE CARD SCREEN ================= */
@@ -140,15 +145,9 @@ export default function App() {
       </main>
 
       <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        @keyframes slideUp {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fade-in { animation: fadeIn 0.6s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fadeIn 0.8s ease-out forwards; }
         .animate-slide-up { animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
       `}</style>
 
