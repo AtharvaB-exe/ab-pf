@@ -15,7 +15,7 @@ const round = (v, precision = 3) => parseFloat(v.toFixed(precision));
 const adjust = (v, fMin, fMax, tMin, tMax) => round(tMin + ((tMax - tMin) * (v - fMin)) / (fMax - fMin));
 
 function ProfileCardComponent({
-  avatarUrl = '/assets/avatar.png',
+  avatarUrl = '/avatar.jpg',
   iconUrl,
   grainUrl,
   innerGradient,
@@ -290,19 +290,59 @@ function ProfileCardComponent({
           --sunpillar-clr-5: var(--sunpillar-5); --sunpillar-clr-6: var(--sunpillar-6);
           --card-radius: 24px;
         }
-        .pc-card-wrapper { perspective: 1000px; transform: translate3d(0, 0, 0.1px); position: relative; touch-action: none; width: 340px; }
+        .pc-card-wrapper { perspective: 1000px; transform: translate3d(0, 0, 0.1px); position: relative; touch-action: none; width: 360px; }
         .pc-behind { position: absolute; inset: -40px; z-index: 0; pointer-events: none; background: radial-gradient(circle at var(--pointer-x) var(--pointer-y), var(--behind-glow-color) 0%, transparent var(--behind-glow-size)); filter: blur(40px) saturate(1.2); opacity: calc(0.85 * var(--card-opacity)); transition: opacity 200ms ease; }
         .pc-card-wrapper:hover, .pc-card-wrapper.active { --card-opacity: 1; }
-        .pc-card { height: 480px; display: grid; border-radius: var(--card-radius); position: relative; background-blend-mode: color-dodge, normal, normal, normal; animation: glow-bg 12s linear infinite; box-shadow: rgba(0, 0, 0, 0.6) calc((var(--pointer-from-left) * 10px) - 5px) calc((var(--pointer-from-top) * 20px) - 10px) 30px -5px; transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1); transform: style3d; background: rgba(10, 10, 12, 0.85); border: 1px solid rgba(255, 255, 255, 0.08); overflow: hidden; backdrop-filter: blur(20px); }
+        .pc-card { height: 520px; border-radius: var(--card-radius); position: relative; box-shadow: rgba(0, 0, 0, 0.6) calc((var(--pointer-from-left) * 10px) - 5px) calc((var(--pointer-from-top) * 20px) - 10px) 30px -5px; transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1); background: rgba(10, 10, 12, 0.85); border: 1px solid rgba(255, 255, 255, 0.08); overflow: hidden; backdrop-filter: blur(20px); }
         .pc-card:hover, .pc-card.active { transition: none; transform: rotateX(var(--rotate-y)) rotateY(var(--rotate-x)) scale3d(1.02, 1.02, 1.02); }
-        .pc-card-shell.entering .pc-card { transition: transform 180ms ease-out; }
-        .pc-card-shell { position: relative; z-index: 1; }
-        .pc-inside { inset: 0; position: absolute; background-image: var(--inner-gradient); padding: 24px; display: flex; flex-direction: column; justify-content: space-between; }
+        .pc-card-shell { position: relative; z-index: 1; height: 100%; }
+        
+        .pc-inside { 
+          inset: 0; 
+          position: absolute; 
+          background-image: var(--inner-gradient); 
+          padding: 32px 24px 24px 24px; 
+          display: flex; 
+          flex-direction: column; 
+          align-items: center;
+          height: 100%;
+          box-sizing: border-box;
+        }
+        
         .pc-shine { position: absolute; inset: 0; transform: translate3d(0, 0, 1px); overflow: hidden; z-index: 3; pointer-events: none; mix-blend-mode: color-dodge; opacity: 0.12; transition: opacity 0.4s ease; background-image: repeating-linear-gradient(0deg, var(--sunpillar-clr-1) 0%, var(--sunpillar-clr-2) 10%, var(--sunpillar-clr-3) 20%, var(--sunpillar-clr-1) 30%); background-size: 100% 300%; background-position: 0 var(--background-y); }
         .pc-card:hover .pc-shine { opacity: 0.35; }
-        .pc-details h3 { font-size: 28px; font-weight: 800; margin: 0 0 4px 0; background: linear-gradient(to bottom, #fff, #a5f3fc); -webkit-text-fill-color: transparent; -webkit-background-clip: text; tracking: -0.03em; }
-        .pc-details p { font-size: 14px; font-weight: 500; color: #a1a1aa; margin: 0; }
-        .pc-user-info { display: flex; align-items: center; justify-content: space-between; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 16px; padding: 12px; margin-top: auto; }
+        
+        /* Fixed text formatting structure headers */
+        .pc-details { text-align: center; margin-bottom: 24px; width: 100%; }
+        .pc-details h3 { font-size: 26px; font-weight: 800; margin: 0 0 6px 0; background: linear-gradient(to bottom, #fff, #a5f3fc); -webkit-text-fill-color: transparent; -webkit-background-clip: text; tracking: -0.03em; }
+        .pc-details p { font-size: 13px; font-weight: 500; color: #a1a1aa; margin: 0; uppercase tracking-wider; }
+        
+        /* Main Middle Big Image Frame block matching the exact target example */
+        .pc-avatar-container {
+          width: 200px;
+          height: 200px;
+          border-radius: 20px;
+          overflow: hidden;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          background: rgba(0, 0, 0, 0.3);
+          box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+          margin: auto 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transform: translateZ(20px);
+          transition: transform 0.3s ease;
+        }
+        .pc-card:hover .pc-avatar-container {
+          transform: translateZ(35px) scale(1.03);
+        }
+        .pc-avatar-img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+
+        .pc-user-info { width: 100%; display: flex; align-items: center; justify-content: space-between; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 16px; padding: 12px; margin-top: auto; box-sizing: border-box; }
         .pc-user-details { display: flex; align-items: center; gap: 10px; }
         .pc-mini-avatar { width: 36px; height: 36px; border-radius: 50%; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.1); }
         .pc-mini-avatar img { width: 100%; height: 100%; object-fit: cover; }
@@ -310,7 +350,7 @@ function ProfileCardComponent({
         .pc-handle { font-size: 13px; font-weight: 600; color: #f4f4f5; }
         .pc-status { font-size: 11px; color: #22d3ee; margin-top: 2px; }
         .pc-contact-btn { border: 1px solid rgba(255, 255, 255, 0.15); background: rgba(255, 255, 255, 0.08); border-radius: 10px; padding: 8px 14px; font-size: 12px; font-weight: 600; color: #fff; cursor: pointer; transition: all 0.2s; backdrop-filter: blur(4px); }
-        .pc-contact-btn:hover { border-color: #22d3ee; background: rgba(34, 211, 238, 0.1); transform: translateY(-1px); }
+        .pc-contact-btn:hover { border-color: #22d3ee; background: rgba(34, 211, 238, 0.1); }
       `}</style>
 
       <div ref={wrapRef} className={`pc-card-wrapper ${className}`.trim()} style={cardStyle}>
@@ -320,11 +360,18 @@ function ProfileCardComponent({
             <div className="pc-inside">
               <div className="pc-shine" />
               
+              {/* Top Details Header Info */}
               <div className="pc-details">
                 <h3>{name}</h3>
                 <p>{title}</p>
               </div>
 
+              {/* Exact center profile block location placement */}
+              <div className="pc-avatar-container">
+                <img className="pc-avatar-img" src={avatarUrl} alt={name} />
+              </div>
+
+              {/* Bottom Interactive Dashboard Module Strip */}
               {showUserInfo && (
                 <div className="pc-user-info">
                   <div className="pc-user-details">
