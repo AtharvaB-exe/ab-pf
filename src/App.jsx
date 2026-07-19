@@ -7,7 +7,7 @@ export default function App() {
 
       <main className="min-h-screen text-white overflow-hidden relative selection:bg-white/20">
         
-        {/* Environment Layer */}
+        {/* Background Visual Asset Viewport */}
         <div
           className="fixed inset-0 bg-cover bg-center transform scale-105 pointer-events-none"
           style={{
@@ -17,7 +17,7 @@ export default function App() {
 
         <div className="fixed inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/50 pointer-events-none" />
 
-        {/* Content Layout */}
+        {/* Content Typography Engine Layout */}
         <section className="relative h-screen flex items-center z-10">
           <div className="max-w-7xl mx-auto px-8 md:px-16 w-full">
             
