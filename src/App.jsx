@@ -1,10 +1,12 @@
 import { useEffect, useRef } from "react";
 
-// Self-contained custom liquid glass pointer engine
 function FluidBlobCursor() {
   const blobRef = useRef(null);
 
   useEffect(() => {
+    // Safety check for production environments
+    if (typeof window === "undefined" || !blobRef.current) return;
+
     let mouseX = window.innerWidth / 2;
     let mouseY = window.innerHeight / 2;
     let currentX = mouseX;
