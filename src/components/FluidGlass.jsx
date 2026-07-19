@@ -67,7 +67,9 @@ const ModeWrapper = memo(function ModeWrapper({
 
       const isDesktop = window.innerWidth > 1024;
       const paddingLeft = isDesktop ? window.innerWidth * 0.12 : window.innerWidth * 0.06;
-      const paddingTop = window.innerHeight * 0.25;
+      
+      // Lifted padding slightly so text works better with centered button systems
+      const paddingTop = window.innerHeight * 0.22;
 
       // 1. Tagline Element
       ctx.font = '700 13px Inter, sans-serif';
@@ -80,7 +82,6 @@ const ModeWrapper = memo(function ModeWrapper({
       ctx.font = `900 ${fontSizePX}px Inter, sans-serif`;
       ctx.fillStyle = 'rgba(255, 255, 255, 0.98)';
       
-      // Calculate a highly deliberate layout gap to force them vertically apart
       const verticalLineHeight = fontSizePX * 0.90; 
       
       const titleRow1Y = paddingTop + 45; 
@@ -99,7 +100,6 @@ const ModeWrapper = memo(function ModeWrapper({
       let wordsArray = bodyCopyText.split(' ');
       let structuredLine = '';
       
-      // Safe dynamic distance under the second row layout
       let currentParagraphY = titleRow2Y + fontSizePX + 25; 
 
       for(let i = 0; i < wordsArray.length; i++) {
