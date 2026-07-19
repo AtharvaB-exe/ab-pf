@@ -2,107 +2,91 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
-html{
-  scroll-behavior:smooth;
+html {
+  scroll-behavior: smooth;
 }
 
-body{
-  margin:0;
-  background:#000;
-  font-family:'Inter',sans-serif;
-  overflow-x:hidden;
+body {
+  margin: 0;
+  background: #000;
+  font-family: 'Inter', sans-serif;
+  overflow-x: hidden;
 }
 
-*{
-  box-sizing:border-box;
-  cursor:none;
+* {
+  box-sizing: border-box;
+  cursor: none !important; /* Erases old standard hardware pointers everywhere */
 }
 
-/* ===== LIQUID GLASS CURSOR ===== */
+/* ===== iOS STYLE ULTRA-CLEAR LIQUID GLASS ENGINE ===== */
 
-.fluid-blob{
-  position:fixed;
+.hidden-goo {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
 
-  top:0;
-  left:0;
+.fluid-cursor-system {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  pointer-events: none;
+}
 
-  width:90px;
-  height:90px;
+.ios-glass-droplet {
+  position: absolute;
+  width: 135px; /* Significantly increased base scale */
+  height: 135px;
+  margin-left: -67.5px;
+  margin-top: -67.5px;
+  border-radius: 50%;
+  pointer-events: none;
+  will-change: transform;
+  filter: url('#ios-liquid-glass');
 
-  z-index:999999;
-
-  pointer-events:none;
-
-  border-radius:
-  45% 55%
-  60% 40% /
-  40% 60%
-  40% 60%;
-
-  backdrop-filter:
-  blur(26px)
-  saturate(200%);
-
-  -webkit-backdrop-filter:
-  blur(26px)
-  saturate(200%);
-
-  background:
-  radial-gradient(
-    circle at 30% 30%,
-    rgba(255,255,255,.45),
-    rgba(255,255,255,.12) 40%,
-    rgba(255,255,255,.03) 100%
+  /* Heavy iOS Frosted Backdrop Distortion Engine */
+  backdrop-filter: blur(32px) saturate(240%) contrast(100%);
+  -webkit-backdrop-filter: blur(32px) saturate(240%) contrast(100%);
+  
+  /* Crystal Clear Center Texture Core — Emphasizes refraction over solid color */
+  background: radial-gradient(
+    circle at 35% 35%,
+    rgba(255, 255, 255, 0.18) 0%,
+    rgba(255, 255, 255, 0.05) 50%,
+    rgba(255, 255, 255, 0.0) 100%
   );
-
-  border:
-  1px solid rgba(255,255,255,.25);
-
-  box-shadow:
-  inset 0 3px 15px rgba(255,255,255,.35),
-  inset 0 -12px 20px rgba(255,255,255,.08),
-  0 15px 40px rgba(0,0,0,.25);
-
-  transition:
-  border-radius .2s ease;
+  
+  /* Ultra thin, clear glossy lip casing */
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  
+  /* Complex inner physics shadow for clear volumetric depth mapping */
+  box-shadow: 
+    inset 0 6px 16px rgba(255, 255, 255, 0.4),
+    inset 0 -10px 25px rgba(255, 255, 255, 0.05),
+    inset -4px -4px 12px rgba(0, 0, 0, 0.05),
+    0 20px 45px rgba(0, 0, 0, 0.35);
 }
 
-.fluid-blob::before{
-  content:"";
-
-  position:absolute;
-
-  inset:8px;
-
-  border-radius:inherit;
-
-  background:
-  radial-gradient(
-    circle at 25% 20%,
-    rgba(255,255,255,.9),
-    transparent 40%
+/* Curved dynamic 3D light highlight */
+.specular-lens-reflection {
+  position: absolute;
+  inset: 6px;
+  border-radius: inherit;
+  background: radial-gradient(
+    circle at 22% 22%,
+    rgba(255, 255, 255, 0.85) 0%,
+    rgba(255, 255, 255, 0) 60%
   );
-
-  filter:blur(10px);
-
-  opacity:.8;
+  filter: blur(3px);
+  opacity: 0.9;
 }
 
-.fluid-blob::after{
-  content:"";
-
-  position:absolute;
-
-  inset:0;
-
-  border-radius:inherit;
-
-  background:
-  linear-gradient(
-    180deg,
-    rgba(255,255,255,.25),
-    transparent
-  );
-
-  mix-blend-mode:screen;
+/* Bottom interior illumination glow */
+.rim-light-accent {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(315deg, rgba(255, 255, 255, 0.15), transparent 60%);
+  mix-blend-mode: overlay;
+  pointer-events: none;
 }
