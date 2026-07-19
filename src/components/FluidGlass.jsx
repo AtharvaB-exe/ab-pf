@@ -7,8 +7,7 @@ import {
   useGLTF,
   Preload,
   MeshTransmissionMaterial,
-  Image,
-  Text
+  Image
 } from '@react-three/drei';
 import { easing } from 'maath';
 
@@ -19,7 +18,7 @@ export default function FluidGlass({ mode = 'lens', lensProps = {} }) {
   return (
     <Canvas camera={{ position: [0, 0, 20], fov: 15 }} gl={{ alpha: true }}>
       <Wrapper modeProps={rawOverrides}>
-        <SceneContent />
+        <SceneBackground />
         <Preload />
       </Wrapper>
     </Canvas>
@@ -67,7 +66,6 @@ const ModeWrapper = memo(function ModeWrapper({
       }
     }
 
-    // Capture everything inside the scene portal into the texture buffer
     gl.setRenderTarget(buffer);
     gl.render(scene, camera);
     gl.setRenderTarget(null);
@@ -109,74 +107,11 @@ function Cube({ modeProps, ...p }) {
 }
 
 function Bar({ modeProps = {}, ...p }) {
-  const defaultMat = {
-    transmission: 1,
-    roughness: 0,
-    thickness: 10,
-    ior: 1.15,
-    color: '#ffffff',
-    attenuationColor: '#ffffff',
-    attenuationDistance: 0.25
-  };
+  const defaultMat = { transmission: 1, roughness: 0, thickness: 10, ior: 1.15, color: '#ffffff' };
   return <ModeWrapper glb="/assets/3d/bar.glb" geometryKey="Cube" lockToBottom followPointer={false} modeProps={{ ...defaultMat, ...modeProps }} {...p} />;
 }
 
-// 3D Scene layout built specifically so the glass lens can catch it
-function SceneContent() {
+function SceneBackground() {
   const { width, height } = useThree((state) => state.viewport);
-
-  return (
-    <group>
-      {/* 3D Background Plane Asset */}
-      <Image position={[0, 0, 0]} scale={[width, height, 1]} url="/bg.png" />
-
-      {/* 3D Typography Layer Element Stack */}
-      <Text
-        position={[-width * 0.15, height * 0.18, 5]}
-        fontSize={height * 0.02}
-        font="https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2"
-        color="#22d3ee"
-        anchorX="left"
-        letterSpacing={0.4}
-      >
-        UI/UX DESIGNER • FRONTEND DEVELOPER
-      </Text>
-
-      <Text
-        position={[-width * 0.15, height * 0.05, 5]}
-        fontSize={height * 0.15}
-        font="https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuGdfAZ9hiA.woff2"
-        fontWeight={900}
-        color="white"
-        anchorX="left"
-        letterSpacing={-0.05}
-      >
-        ATHARVA
-      </Text>
-
-      <Text
-        position={[-width * 0.15, -height * 0.08, 5]}
-        fontSize={height * 0.15}
-        font="https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuGdfAZ9hiA.woff2"
-        fontWeight={900}
-        color="white"
-        anchorX="left"
-        letterSpacing={-0.05}
-      >
-        BULBULE
-      </Text>
-
-      <Text
-        position={[-width * 0.15, -height * 0.18, 5]}
-        fontSize={height * 0.025}
-        font="https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2"
-        color="#d4d4d8"
-        anchorX="left"
-        maxWidth={width * 0.4}
-        lineHeight={1.4}
-      >
-        Crafting cinematic digital experiences through design, code, and visual storytelling.
-      </Text>
-    </group>
-  );
+  return <Image position={[0, 0, 0]} scale={[width, height, 1]} url="/bg.png" />;
 }

@@ -9,7 +9,7 @@ html, body, #root {
   height: 100%;
   background-color: #050505;
   font-family: 'Inter', sans-serif;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 * {
@@ -17,34 +17,8 @@ html, body, #root {
   cursor: none !important;
 }
 
-/* ===== iOS LIQUID GLASS STYLE WRAPPERS ===== */
-
-.fluid-cursor-system {
-  position: fixed;
-  inset: 0;
-  z-index: 999999;
-  pointer-events: none;
-  width: 100vw;
-  height: 100vh;
-}
-
-.ios-glass-droplet {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 140px;
-  height: 140px;
-  pointer-events: none;
-  will-change: transform, border-radius;
-  
-  /* High Quality iOS Refraction Blur */
-  backdrop-filter: blur(24px) saturate(180%) contrast(100%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%) contrast(100%);
-  
-  filter: blur(6px); 
-  background: transparent;
-  
-  box-shadow: 
-    inset 0 4px 12px rgba(255, 255, 255, 0.08),
-    inset 0 -4px 12px rgba(0, 0, 0, 0.15);
+canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
 }
