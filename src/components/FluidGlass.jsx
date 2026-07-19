@@ -11,13 +11,13 @@ import {
 } from '@react-three/drei';
 import { easing } from 'maath';
 
-export default function FluidGlass({ mode = 'lens', lensProps = {}, mousePos = { x: 0, y: 0 }, htmlRef }) {
+export default function FluidGlass({ mode = 'lens', lensProps = {}, mousePos = { x: 0, y: 0 }, htmlRef, onParagraphBottom }) {
   const Wrapper = mode === 'bar' ? Bar : mode === 'cube' ? Cube : Lens;
   const rawOverrides = mode === 'lens' ? lensProps : {};
 
   return (
     <Canvas camera={{ position: [0, 0, 20], fov: 15 }} gl={{ alpha: true }}>
-      <Wrapper modeProps={rawOverrides} mousePos={mousePos} htmlRef={htmlRef}>
+      <Wrapper modeProps={rawOverrides} mousePos={mousePos} htmlRef={htmlRef} onParagraphBottom={onParagraphBottom}>
         <Preload />
       </Wrapper>
     </Canvas>
@@ -32,6 +32,7 @@ const ModeWrapper = memo(function ModeWrapper({
   modeProps = {},
   mousePos,
   htmlRef,
+  onParagraphBottom,
   ...props
 }) {
   const ref = useRef();
@@ -67,9 +68,7 @@ const ModeWrapper = memo(function ModeWrapper({
 
       const isDesktop = window.innerWidth > 1024;
       const paddingLeft = isDesktop ? window.innerWidth * 0.12 : window.innerWidth * 0.06;
-      
-      // Lifted padding slightly so text works better with centered button systems
-      const paddingTop = window.innerHeight * 0.22;
+      const paddingTop = window.innerHeight * 0.25;
 
       // 1. Tagline Element
       ctx.font = '700 13px Inter, sans-serif';
@@ -77,20 +76,19 @@ const ModeWrapper = memo(function ModeWrapper({
       ctx.textBaseline = 'top';
       ctx.fillText('UI/UX DESIGNER • FRONTEND DEVELOPER', paddingLeft, paddingTop);
 
-      // 2. Main Title Layout Sizing Calculations
+      // 2. Main Title Layout Sizing
       const fontSizePX = window.innerWidth * 0.11; 
       ctx.font = `900 ${fontSizePX}px Inter, sans-serif`;
       ctx.fillStyle = 'rgba(255, 255, 255, 0.98)';
       
       const verticalLineHeight = fontSizePX * 0.90; 
-      
       const titleRow1Y = paddingTop + 45; 
       const titleRow2Y = titleRow1Y + verticalLineHeight;
 
       ctx.fillText('ATHARVA', paddingLeft, titleRow1Y);
       ctx.fillText('BULBULE', paddingLeft, titleRow2Y);
 
-      // 3. Paragraph Container Block
+      // 3. Paragraph Container
       const paragraphFontSize = isDesktop ? 20 : 16;
       ctx.font = `500 ${paragraphFontSize}px Inter, sans-serif`;
       ctx.fillStyle = '#d4d4d8';
@@ -115,6 +113,11 @@ const ModeWrapper = memo(function ModeWrapper({
       }
       ctx.fillText(structuredLine, paddingLeft, currentParagraphY);
 
+      // Calculate the bottom point of text and lift it up to App.jsx
+      if (onParagraphBottom) {
+        onParagraphBottom(currentParagraphY + (paragraphFontSize * 1.5));
+      }
+
       const texture = new THREE.CanvasTexture(canvas);
       texture.needsUpdate = true;
       setHtmlTexture(texture);
@@ -123,7 +126,7 @@ const ModeWrapper = memo(function ModeWrapper({
     updateTextureFromHTML();
     window.addEventListener('resize', updateTextureFromHTML);
     return () => window.removeEventListener('resize', updateTextureFromHTML);
-  }, [htmlRef]);
+  }, [htmlRef, onParagraphBottom]);
 
   useFrame((state, delta) => {
     const { gl, camera } = state;
