@@ -20,7 +20,7 @@ export default function App() {
   return (
     <div className="relative w-full h-screen bg-[#050505] overflow-hidden select-none">
       
-      {/* 1. 3D WebGL Fluid Lens Canvas Layer */}
+      {/* 3D Canvas Refraction Engine */}
       <div className="absolute inset-0 z-0 w-full h-full pointer-events-none">
         <FluidGlass 
           mode="lens" 
@@ -36,14 +36,13 @@ export default function App() {
         />
       </div>
 
-      {/* 2. Dark Premium Vignette Overlay */}
       <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/10 via-transparent to-black/40 pointer-events-none" />
 
-      {/* 3. Pure DOM Interactive Capture Overlay Layout Sheet */}
+      {/* HTML Interactive Button Overlay Layer */}
       <main ref={htmlContentRef} className="absolute inset-0 z-20 min-h-screen flex items-center justify-center">
         <div className="max-w-7xl mx-auto px-8 md:px-16 w-full py-20 text-white flex flex-col items-center justify-center">
           
-          {/* Mirrors the structural text container size precisely at 0 opacity to preserve center flow layout */}
+          {/* Transparent structural block keeping layout spacing intact */}
           <div className="opacity-0 pointer-events-none text-center">
             <p className="text-cyan-400 uppercase tracking-[0.5em] text-xs font-bold mb-6">
               UI/UX DESIGNER • FRONTEND DEVELOPER
@@ -59,7 +58,7 @@ export default function App() {
             </p>
           </div>
 
-          {/* 4. Centered Interactive React Bits BorderGlow Button Component */}
+          {/* Centered Glowing Border Component */}
           <div className="mt-14 pointer-events-auto">
             <BorderGlow
               edgeSensitivity={40}
