@@ -31,15 +31,33 @@ export default function App() {
       {/* 2. Ambient Lighting Vignette */}
       <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/20 via-transparent to-black/50 pointer-events-none" />
 
-      {/* 3. HTML Screen Layer Router */}
-      <main ref={htmlContentRef} className="absolute inset-0 z-20 min-h-screen flex items-center justify-center transition-all duration-700">
+      {/* 3. 3D WebGL Fluid Lens Canvas Layer (Moved underneath the interactive content) */}
+      {!isEntered && (
+        <div className="absolute inset-0 z-20 w-full h-full pointer-events-none">
+          <FluidGlass 
+            mode="lens" 
+            mousePos={mousePos}
+            htmlRef={htmlContentRef}
+            lensProps={{
+              scale: 0.24,
+              ior: 1.25,
+              thickness: 5.5,
+              chromaticAberration: 0.14,
+              anisotropy: 0.03  
+            }}
+          />
+        </div>
+      )}
+
+      {/* 4. HTML Layer (Brought to z-30 so it captures clicks perfectly) */}
+      <main ref={htmlContentRef} className="absolute inset-0 z-30 min-h-screen flex items-center justify-center transition-all duration-700">
         
         {!isEntered ? (
           /* ================= GATEWAY GATE ENTRY STAGE ================= */
           <div className="max-w-7xl mx-auto px-8 md:px-16 w-full py-20 text-white flex flex-col items-center justify-center animate-fade-in">
             
-            {/* Mirror spacers mapping matching bounds exactly */}
-            <div className="opacity-0 pointer-events-none text-center">
+            {/* Mirror spacers mapping matching bounds exactly - explicitly ignoring pointers */}
+            <div className="opacity-0 pointer-events-none text-center select-none">
               <p className="text-cyan-400 uppercase tracking-[0.5em] text-xs font-bold mb-6">
                 UI/UX DESIGNER • FRONTEND DEVELOPER
               </p>
@@ -50,8 +68,8 @@ export default function App() {
               </p>
             </div>
 
-            {/* Glowing Custom Enter Trigger Box */}
-            <div className="mt-14 pointer-events-auto">
+            {/* Glowing Custom Enter Trigger Box - Forces pointer events on to override parent blocking */}
+            <div className="mt-14 pointer-events-auto relative z-50">
               <BorderGlow
                 edgeSensitivity={40}
                 glowColor="190 90% 60%"
@@ -76,14 +94,14 @@ export default function App() {
           </div>
         ) : (
           /* ================= MAIN PROFILE CARD STAGE ================= */
-          <div className="w-full h-full flex items-center justify-center p-6 animate-slide-up pointer-events-auto">
+          <div className="w-full h-full flex items-center justify-center p-6 animate-slide-up pointer-events-auto select-text">
             <ProfileCard
               name="Atharva Bulbule"
               title="UI/UX Designer & Frontend Developer"
               handle="atharvabulbule"
               status="Available for Projects"
               contactText="Get In Touch"
-              avatarUrl="/bg.png" /* Swap this with your real custom display picture asset path */
+              avatarUrl="/bg.png" 
               miniAvatarUrl="/bg.png"
               enableTilt={true}
               behindGlowEnabled={true}
@@ -95,24 +113,6 @@ export default function App() {
         )}
 
       </main>
-
-      {/* 4. 3D WebGL Glass Lens Refraction Shader (Hides automatically in Dashboard mode for performance) */}
-      {!isEntered && (
-        <div className="absolute inset-0 z-30 w-full h-full pointer-events-none">
-          <FluidGlass 
-            mode="lens" 
-            mousePos={mousePos}
-            htmlRef={htmlContentRef}
-            lensProps={{
-              scale: 0.24,
-              ior: 1.25,
-              thickness: 5.5,
-              chromaticAberration: 0.14,
-              anisotropy: 0.03  
-            }}
-          />
-        </div>
-      )}
 
       {/* Basic Keyframe Transitions Styles */}
       <style>{`
