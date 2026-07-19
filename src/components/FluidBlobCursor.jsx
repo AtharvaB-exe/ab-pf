@@ -11,8 +11,11 @@ export default function FluidBlobCursor() {
     
     let velX = 0;
     let velY = 0;
-    const friction = 0.8;
-    const acceleration = 0.1;
+    const friction = 0.85; 
+    const acceleration = 0.08; 
+
+    // Time counter for organic shape morphing when standing still
+    let time = 0;
 
     const handleMouseMove = (e) => {
       mouseX = e.clientX;
@@ -22,6 +25,9 @@ export default function FluidBlobCursor() {
     window.addEventListener("mousemove", handleMouseMove);
 
     const updateFluidPhysics = () => {
+      time += 0.05;
+
+      // Smooth physics interpolation (Zero flickering)
       const dx = mouseX - currentX;
       const dy = mouseY - currentY;
 
@@ -35,8 +41,7 @@ export default function FluidBlobCursor() {
       currentY += velY;
 
       const speed = Math.sqrt(velX * velX + velY * velY);
-      const maxStretch = 0.6; 
-      const stretch = Math.min(speed * 0.02, maxStretch);
+      const stretch = Math.min(speed * 0.02, 0.7);
       
       const scaleX = 1 + stretch;
       const scaleY = 1 - stretch * 0.5;
@@ -46,12 +51,22 @@ export default function FluidBlobCursor() {
         angle = Math.atan2(velY, velX) * (180 / Math.PI);
       }
 
+      // Generate organic, asymmetrical blob shapes that constantly shift slightly
+      const r1 = 45 + Math.sin(time) * 6;
+      const r2 = 55 + Math.cos(time + 1) * 6;
+      const r3 = 60 + Math.sin(time + 2) * 6;
+      const r4 = 40 + Math.cos(time + 3) * 6;
+      const r5 = 50 + Math.sin(time + 4) * 6;
+      const r6 = 45 + Math.cos(time + 5) * 6;
+
       if (blobRef.current) {
-        // Utilizing top/left fallback alongside translation to secure rendering layout visibility
-        blobRef.current.style.left = `${currentX}px`;
-        blobRef.current.style.top = `${currentY}px`;
+        // Morph the shape dynamically so it never feels like a perfect circle
+        blobRef.current.style.borderRadius = `${r1}% ${100-r1}% ${r2}% ${100-r2}% / ${r3}% ${r4}% ${100-r4}% ${100-r3}%`;
+        
+        // Execute position exclusively via hardware-accelerated translate3d (Fixes flickering)
         blobRef.current.style.transform = `
-          translate3d(-50%, -50%, 0)
+          translate3d(${currentX}px, ${currentY}px, 0)
+          translate(-50%, -50%)
           rotate(${angle}deg)
           scale(${scaleX}, ${scaleY})
         `;
