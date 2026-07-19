@@ -115,7 +115,7 @@ const ModeWrapper = memo(function ModeWrapper({
       }
       ctx.fillText(structuredLine, paddingLeft, currentParagraphY);
 
-      // 4. Draw Vector Component Button (Changed text tracking matrix context here)
+      // 4. Draw Vector Component Button Base Shell Only (No text inside to prevent duplicate vision)
       const buttonY = currentParagraphY + paragraphFontSize * 2 + 10;
       const btnWidth = 150;
       const btnHeight = 48;
@@ -128,12 +128,6 @@ const ModeWrapper = memo(function ModeWrapper({
       ctx.stroke();
       ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
       ctx.fill();
-
-      ctx.font = '600 14px Inter, sans-serif';
-      ctx.fillStyle = '#ffffff';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText('Enter', paddingLeft, buttonY + btnHeight / 2);
       
       ctx.textAlign = 'left';
 

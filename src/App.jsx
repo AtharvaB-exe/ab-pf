@@ -20,7 +20,7 @@ export default function App() {
   return (
     <div className="relative w-full h-screen bg-[#050505] overflow-hidden select-none">
       
-      {/* 3D WebGL Canvas Layer */}
+      {/* 3D WebGL Fluid Lens Canvas Base Layer */}
       <div className="absolute inset-0 z-0 w-full h-full pointer-events-none">
         <FluidGlass 
           mode="lens" 
@@ -38,10 +38,11 @@ export default function App() {
 
       <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/10 via-transparent to-black/40 pointer-events-none" />
 
-      {/* HTML Interactive Capture Sheet Overlay */}
+      {/* Primary HTML Active Content Interface */}
       <main ref={htmlContentRef} className="absolute inset-0 z-20 min-h-screen flex items-center justify-center">
         <div className="max-w-7xl mx-auto px-8 md:px-16 w-full py-20 text-white flex flex-col items-center justify-center">
           
+          {/* Transparent spacer layouts ensuring aligned structural metrics stack up correctly */}
           <div className="opacity-0 pointer-events-none text-center">
             <p className="text-cyan-400 uppercase tracking-[0.5em] text-xs font-bold mb-6">
               UI/UX DESIGNER • FRONTEND DEVELOPER
@@ -57,7 +58,7 @@ export default function App() {
             </p>
           </div>
 
-          {/* Centered Glowing Border Card Core Container */}
+          {/* Centered React Bits BorderGlow Component Wrapper */}
           <div className="mt-14 pointer-events-auto">
             <BorderGlow
               edgeSensitivity={40}
@@ -71,7 +72,7 @@ export default function App() {
               colors={['#22d3ee', '#38bdf8', '#c084fc']}
             >
               <button 
-                onClick={() => console.log("Enter action link clicked!")}
+                onClick={() => console.log("Enter clicked!")}
                 className="px-8 py-4 bg-transparent text-sm font-semibold tracking-wider text-white cursor-pointer select-none border border-transparent rounded-full focus:outline-none transition-transform active:scale-95"
                 style={{ minWidth: '150px', minHeight: '48px' }}
               >
