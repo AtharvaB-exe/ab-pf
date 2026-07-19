@@ -114,20 +114,6 @@ const ModeWrapper = memo(function ModeWrapper({
         }
       }
       ctx.fillText(structuredLine, paddingLeft, currentParagraphY);
-
-      // 4. Draw Vector Component Button Base Shell Only (No text inside to prevent duplicate vision)
-      const buttonY = currentParagraphY + paragraphFontSize * 2 + 10;
-      const btnWidth = 150;
-      const btnHeight = 48;
-      const radius = 24;
-
-      ctx.beginPath();
-      ctx.roundRect(paddingLeft - btnWidth / 2, buttonY, btnWidth, btnHeight, radius);
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
-      ctx.lineWidth = 1;
-      ctx.stroke();
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
-      ctx.fill();
       
       ctx.textAlign = 'left';
 
