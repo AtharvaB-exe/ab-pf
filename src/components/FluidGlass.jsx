@@ -1,15 +1,17 @@
 /* eslint-disable react/no-unknown-property */
 import * as THREE from 'three';
 import { useRef, useState, useEffect, memo } from 'react';
-import { Canvas, useFrame, useThree, createPortal } from '@react-three/fiber';
-import { useFBO, useGLTF, Preload, MeshTransmissionMaterial } from '@react-three/drei';
+import { Canvas, createPortal, useFrame, useThree } from '@react-three/fiber';
+import { useFBO, useGLTF, Preload, MeshTransmissionMaterial, Image } from '@react-three/drei';
 import { easing } from 'maath';
 
-export default function FluidGlass({ mode = 'lens', lensProps = {}, mousePos = { x: 0, y: 0 } }) {
+export default function FluidGlass({ mode = 'lens', lensProps = {}, mousePos = { x: 0, y: 0 }, htmlRef }) {
   const Wrapper = mode === 'bar' ? Bar : mode === 'cube' ? Cube : Lens;
+  const rawOverrides = mode === 'lens' ? lensProps : {};
+
   return (
     <Canvas camera={{ position: [0, 0, 20], fov: 15 }} gl={{ alpha: true }}>
-      <Wrapper modeProps={lensProps} mousePos={mousePos}>
+      <Wrapper modeProps={rawOverrides} mousePos={mousePos} htmlRef={htmlRef}>
         <Preload />
       </Wrapper>
     </Canvas>
@@ -23,15 +25,19 @@ const ModeWrapper = memo(function ModeWrapper({
   followPointer = true,
   modeProps = {},
   mousePos,
+  htmlRef,
   ...props
 }) {
   const ref = useRef();
+  const backgroundMeshRef = useRef();
+  const textOverlayMeshRef = useRef();
+  
+  const { nodes } = useGLTF(glb);
   const buffer = useFBO();
   const { viewport: vp } = useThree();
   const [scene] = useState(() => new THREE.Scene());
   const geoWidthRef = useRef(1);
-
-  const { nodes } = useGLTF(glb);
+  const [htmlTexture, setHtmlTexture] = useState(null);
 
   useEffect(() => {
     const geo = nodes[geometryKey]?.geometry;
@@ -40,6 +46,77 @@ const ModeWrapper = memo(function ModeWrapper({
       geoWidthRef.current = geo.boundingBox.max.x - geo.boundingBox.min.x || 1;
     }
   }, [nodes, geometryKey]);
+
+  useEffect(() => {
+    const canvas = document.createElement('canvas');
+    const updateTextureFromHTML = () => {
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = window.innerWidth * dpr;
+      canvas.height = window.innerHeight * dpr;
+      const ctx = canvas.getContext('2d');
+      
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.scale(dpr, dpr);
+
+      const isDesktop = window.innerWidth > 1024;
+      const paddingLeft = window.innerWidth / 2;
+      const paddingTop = window.innerHeight * 0.20;
+      
+      ctx.textAlign = 'center';
+
+      // 1. Render Subheader Tagline
+      ctx.font = '700 13px Inter, sans-serif';
+      ctx.fillStyle = '#22d3ee';
+      ctx.textBaseline = 'top';
+      ctx.fillText('UI/UX DESIGNER • FRONTEND DEVELOPER', paddingLeft, paddingTop);
+
+      // 2. Render Main Big Typography Headline Stack
+      const fontSizePX = window.innerWidth * 0.11; 
+      ctx.font = `900 ${fontSizePX}px Inter, sans-serif`;
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.98)';
+      
+      const verticalLineHeight = fontSizePX * 0.90; 
+      const titleRow1Y = paddingTop + 45; 
+      const titleRow2Y = titleRow1Y + verticalLineHeight;
+
+      ctx.fillText('ATHARVA', paddingLeft, titleRow1Y);
+      ctx.fillText('BULBULE', paddingLeft, titleRow2Y);
+
+      // 3. Render Bottom Paragraph Box
+      const paragraphFontSize = isDesktop ? 20 : 16;
+      ctx.font = `500 ${paragraphFontSize}px Inter, sans-serif`;
+      ctx.fillStyle = '#d4d4d8';
+      
+      const bodyCopyText = 'Crafting cinematic digital experiences through design, code, and visual storytelling.';
+      const maxTextWidth = isDesktop ? window.innerWidth * 0.50 : window.innerWidth * 0.85;
+      let wordsArray = bodyCopyText.split(' ');
+      let structuredLine = '';
+      let currentParagraphY = titleRow2Y + fontSizePX + 25; 
+
+      for(let i = 0; i < wordsArray.length; i++) {
+        let testTextLine = structuredLine + wordsArray[i] + ' ';
+        let measurementMetrics = ctx.measureText(testTextLine);
+        if (measurementMetrics.width > maxTextWidth && i > 0) {
+          ctx.fillText(structuredLine, paddingLeft, currentParagraphY);
+          structuredLine = wordsArray[i] + ' ';
+          currentParagraphY += paragraphFontSize * 1.5; 
+        } else {
+          structuredLine = testTextLine;
+        }
+      }
+      ctx.fillText(structuredLine, paddingLeft, currentParagraphY);
+      
+      ctx.textAlign = 'left';
+
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.needsUpdate = true;
+      setHtmlTexture(texture);
+    };
+
+    updateTextureFromHTML();
+    window.addEventListener('resize', updateTextureFromHTML);
+    return () => window.removeEventListener('resize', updateTextureFromHTML);
+  }, [htmlRef]);
 
   useFrame((state, delta) => {
     const { gl, camera } = state;
@@ -66,10 +143,15 @@ const ModeWrapper = memo(function ModeWrapper({
   return (
     <>
       {createPortal(
-        <mesh scale={[vp.width, vp.height, 1]}>
-          <planeGeometry />
-          <meshBasicMaterial color="#050505" opacity={0} transparent />
-        </mesh>,
+        <group>
+          <Image ref={backgroundMeshRef} position={[0, 0, 0]} scale={[vp.width, vp.height, 1]} url="/bg.png" />
+          {htmlTexture && (
+            <mesh ref={textOverlayMeshRef} position={[0, 0, 1]}>
+              <planeGeometry args={[vp.width, vp.height]} />
+              <meshBasicMaterial map={htmlTexture} transparent />
+            </mesh>
+          )}
+        </group>,
         scene
       )}
       <mesh scale={[vp.width, vp.height, 1]}>
@@ -95,6 +177,15 @@ const ModeWrapper = memo(function ModeWrapper({
   );
 });
 
-function Lens({ modeProps, ...p }) { return <ModeWrapper glb="/assets/3d/lens.glb" geometryKey="Cylinder" followPointer modeProps={modeProps} {...p} />; }
-function Cube({ modeProps, ...p }) { return <ModeWrapper glb="/assets/3d/cube.glb" geometryKey="Cube" followPointer modeProps={modeProps} {...p} />; }
-function Bar({ modeProps = {}, ...p }) { return <ModeWrapper glb="/assets/3d/bar.glb" geometryKey="Cube" lockToBottom followPointer={false} modeProps={p.modeProps} {...p} />; }
+function Lens({ modeProps, ...p }) {
+  return <ModeWrapper glb="/assets/3d/lens.glb" geometryKey="Cylinder" followPointer modeProps={modeProps} {...p} />;
+}
+
+function Cube({ modeProps, ...p }) {
+  return <ModeWrapper glb="/assets/3d/cube.glb" geometryKey="Cube" followPointer modeProps={modeProps} {...p} />;
+}
+
+function Bar({ modeProps = {}, ...p }) {
+  const defaultMat = { transmission: 1, roughness: 0, thickness: 10, ior: 1.15, color: '#ffffff' };
+  return <ModeWrapper glb="/assets/3d/bar.glb" geometryKey="Cube" lockToBottom followPointer={false} modeProps={{ ...defaultMat, ...modeProps }} {...p} />;
+}
