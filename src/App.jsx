@@ -1,13 +1,30 @@
+import { useState, useEffect } from "react";
 import FluidGlass from "./components/FluidGlass";
 
 export default function App() {
+  // Global coordinate engine state
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const handleGlobalMouseMove = (e) => {
+      // Normalize layout points between -1 and 1 to pass safely onto WebGL shaders
+      const x = (e.clientX / window.innerWidth) * 2 - 1;
+      const y = -(e.clientY / window.innerHeight) * 2 + 1;
+      setMousePos({ x, y });
+    };
+
+    window.addEventListener("mousemove", handleGlobalMouseMove);
+    return () => window.removeEventListener("mousemove", handleGlobalMouseMove);
+  }, []);
+
   return (
     <div className="relative w-full h-screen bg-[#050505] overflow-hidden select-none">
       
-      {/* Layer 1: True 3D WebGL Fluid Lens Background Casing */}
+      {/* Layer 1: 3D WebGL Fluid Lens Background Casing with injected pointer track system */}
       <div className="absolute inset-0 z-0 w-full h-full pointer-events-none">
         <FluidGlass 
           mode="lens" 
+          mousePos={mousePos}
           lensProps={{
             scale: 0.24,
             ior: 1.2,
@@ -18,7 +35,7 @@ export default function App() {
         />
       </div>
 
-      {/* Layer 2: Master Static HTML Background Image Layout View */}
+      {/* Layer 2: Master Background Graphics Layout */}
       <div
         className="absolute inset-0 bg-cover bg-center transform scale-100 pointer-events-none z-10 mix-blend-screen opacity-40"
         style={{
@@ -29,7 +46,7 @@ export default function App() {
       {/* Layer 3: Cinematic Atmospheric Vignette Overlay */}
       <div className="absolute inset-0 z-20 bg-gradient-to-b from-black/40 via-transparent to-black/60 pointer-events-none" />
 
-      {/* Layer 4: Stable HTML Typography Layout & Click Targets */}
+      {/* Layer 4: Interactive HTML Typography Layout */}
       <main className="absolute inset-0 z-30 min-h-screen flex items-center">
         <div className="max-w-7xl mx-auto px-8 md:px-16 w-full py-20 text-white">
           

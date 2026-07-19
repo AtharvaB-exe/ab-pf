@@ -11,13 +11,13 @@ import {
 } from '@react-three/drei';
 import { easing } from 'maath';
 
-export default function FluidGlass({ mode = 'lens', lensProps = {} }) {
+export default function FluidGlass({ mode = 'lens', lensProps = {}, mousePos = { x: 0, y: 0 } }) {
   const Wrapper = mode === 'bar' ? Bar : mode === 'cube' ? Cube : Lens;
   const rawOverrides = mode === 'lens' ? lensProps : {};
 
   return (
     <Canvas camera={{ position: [0, 0, 20], fov: 15 }} gl={{ alpha: true }}>
-      <Wrapper modeProps={rawOverrides}>
+      <Wrapper modeProps={rawOverrides} mousePos={mousePos}>
         <RefractionSceneTarget />
         <Preload />
       </Wrapper>
@@ -32,16 +32,14 @@ const ModeWrapper = memo(function ModeWrapper({
   lockToBottom = false,
   followPointer = true,
   modeProps = {},
+  mousePos,
   ...props
 }) {
   const ref = useRef();
   const { nodes } = useGLTF(glb);
   const buffer = useFBO();
   const { viewport: vp } = useThree();
-  const [scene] = useState(() => {
-    const s = new THREE.Scene();
-    return s;
-  });
+  const [scene] = useState(() => new THREE.Scene());
   const geoWidthRef = useRef(1);
 
   useEffect(() => {
@@ -53,11 +51,12 @@ const ModeWrapper = memo(function ModeWrapper({
   }, [nodes, geometryKey]);
 
   useFrame((state, delta) => {
-    const { gl, pointer, camera } = state;
+    const { gl, camera } = state;
     const v = state.viewport.getCurrentViewport(camera, [0, 0, 15]);
 
-    const destX = followPointer ? (pointer.x * v.width) / 2 : 0;
-    const destY = lockToBottom ? -v.height / 2 + 0.2 : followPointer ? (pointer.y * v.height) / 2 : 0;
+    // Use root level coordinates converted directly to Three.js view space coordinates
+    const destX = followPointer ? (mousePos.x * v.width) / 2 : 0;
+    const destY = lockToBottom ? -v.height / 2 + 0.2 : followPointer ? (mousePos.y * v.height) / 2 : 0;
     
     if (ref.current) {
       easing.damp3(ref.current.position, [destX, destY, 15], 0.12, delta);
@@ -69,7 +68,6 @@ const ModeWrapper = memo(function ModeWrapper({
       }
     }
 
-    // Capture the internal scene textures into the offscreen FBO buffer
     gl.setRenderTarget(buffer);
     gl.render(scene, camera);
     gl.setRenderTarget(null);
@@ -80,14 +78,10 @@ const ModeWrapper = memo(function ModeWrapper({
   return (
     <>
       {createPortal(children, scene)}
-      
-      {/* 1. Underlying main base texture pass to make sure the glass has data to distort */}
       <mesh scale={[vp.width, vp.height, 1]}>
         <planeGeometry />
-        <meshBasicMaterial map={buffer.texture} transparent opacity={1} />
+        <meshBasicMaterial map={buffer.texture} transparent />
       </mesh>
-      
-      {/* 2. The physical floating glass lens geometry mesh */}
       {nodes[geometryKey] && (
         <mesh ref={ref} scale={scale ?? 0.24} rotation-x={Math.PI / 2} geometry={nodes[geometryKey].geometry} {...props}>
           <MeshTransmissionMaterial
@@ -120,7 +114,6 @@ function Bar({ modeProps = {}, ...p }) {
   return <ModeWrapper glb="/assets/3d/bar.glb" geometryKey="Cube" lockToBottom followPointer={false} modeProps={{ ...defaultMat, ...modeProps }} {...p} />;
 }
 
-// Internal target engine: This provides the visual matrix texture data exclusively for the lens to refract
 function RefractionSceneTarget() {
   const { width, height } = useThree((state) => state.viewport);
   return <Image position={[0, 0, 0]} scale={[width, height, 1]} url="/bg.png" />;
