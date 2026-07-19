@@ -37,7 +37,7 @@ export default function App() {
   return (
     <div className="relative w-full h-screen bg-[#050505] overflow-hidden font-sans cursor-none select-none">
       
-      {/* Dynamic Cursor Dot */}
+      {/* Precision Dynamic Cursor Dot */}
       <div 
         className="fixed w-2 h-2 bg-cyan-400 rounded-full pointer-events-none z-50 shadow-[0_0_10px_#22d3ee] -translate-x-1/2 -translate-y-1/2 transition-all duration-75 ease-out"
         style={{ left: `${rawCursor.x}px`, top: `${rawCursor.y}px` }}
@@ -47,16 +47,16 @@ export default function App() {
         style={{ left: `${rawCursor.x}px`, top: `${rawCursor.y}px` }}
       />
 
-      {/* Background Texture */}
+      {/* Underlying Base Background Layer */}
       <div
         className="absolute inset-0 bg-cover bg-center pointer-events-none z-0 opacity-40 mix-blend-screen"
         style={{ backgroundImage: "url('/bg.png')" }}
       />
 
-      {/* Vignette */}
+      {/* Ambient Lighting Vignette */}
       <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/20 via-transparent to-black/50 pointer-events-none" />
 
-      {/* 3D Fluid Lens Layer */}
+      {/* 3D WebGL Fluid Lens Canvas layer */}
       {!isEntered && (
         <div className="absolute inset-0 z-20 w-full h-full pointer-events-none">
           <FluidGlass 
@@ -74,14 +74,15 @@ export default function App() {
         </div>
       )}
 
-      {/* Content Layout Layer */}
+      {/* HTML Core Page Elements Structure Layout */}
       <main ref={htmlContentRef} className="absolute inset-0 z-30 min-h-screen flex items-center justify-center transition-all duration-700">
         
         {!isEntered ? (
           /* ================= LANDING SCREEN ================= */
           <div className="max-w-7xl mx-auto px-8 md:px-16 w-full py-20 text-white flex flex-col items-center justify-center animate-fade-in">
             
-            <div className="text-center mb-6">
+            {/* Real Interactive Typography Container */}
+            <div className="text-center mb-6 relative z-40">
               <p className="text-cyan-400 uppercase tracking-[0.5em] text-xs font-bold mb-6">
                 UI/UX DESIGNER • FRONTEND DEVELOPER
               </p>
@@ -92,7 +93,7 @@ export default function App() {
               </p>
             </div>
 
-            {/* Interactive Button */}
+            {/* Glowing Custom Enter Button Container */}
             <div className="mt-14 pointer-events-auto relative z-50">
               <BorderGlow
                 edgeSensitivity={40}
@@ -139,8 +140,14 @@ export default function App() {
       </main>
 
       <style>{`
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes slideUp {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
         .animate-fade-in { animation: fadeIn 0.6s ease-out forwards; }
         .animate-slide-up { animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
       `}</style>
