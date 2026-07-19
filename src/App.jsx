@@ -3,12 +3,10 @@ import FluidBlobCursor from "./components/FluidBlobCursor";
 export default function App() {
   return (
     <>
-      {/* Heavy Liquid Glass Engine Insertion */}
       <FluidBlobCursor />
 
       <main className="min-h-screen text-white overflow-hidden relative selection:bg-white/20">
         
-        {/* Background Visual Asset Target */}
         <div
           className="fixed inset-0 bg-cover bg-center transform scale-105 pointer-events-none"
           style={{
@@ -16,10 +14,8 @@ export default function App() {
           }}
         />
 
-        {/* Ambient Dark Environment Vignette */}
         <div className="fixed inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/50 pointer-events-none" />
 
-        {/* Clean Modern Typography Core */}
         <section className="relative h-screen flex items-center z-10">
           <div className="max-w-7xl mx-auto px-8 md:px-16 w-full">
             
