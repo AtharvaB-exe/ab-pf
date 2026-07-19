@@ -6,6 +6,8 @@ import {
   useFBO,
   useGLTF,
   Preload,
+  ScrollControls,
+  Scroll,
   MeshTransmissionMaterial
 } from '@react-three/drei';
 import { easing } from 'maath';
@@ -16,10 +18,16 @@ export default function FluidGlass({ mode = 'lens', lensProps = {}, children }) 
 
   return (
     <Canvas camera={{ position: [0, 0, 20], fov: 15 }} gl={{ alpha: true }}>
-      <Wrapper modeProps={rawOverrides}>
-        {children}
-        <Preload />
-      </Wrapper>
+      {/* We add ScrollControls so the HTML overlay attaches correctly inside the WebGL tree */}
+      <ScrollControls pages={1} distance={0}>
+        <Wrapper modeProps={rawOverrides}>
+          {/* This renders the HTML inside the 3D pipeline so the lens can capture and refract it */}
+          <Scroll html style={{ width: '100%', height: '100%' }}>
+            {children}
+          </Scroll>
+          <Preload />
+        </Wrapper>
+      </ScrollControls>
     </Canvas>
   );
 }
@@ -49,8 +57,8 @@ const ModeWrapper = memo(function ModeWrapper({
   }, [nodes, geometryKey]);
 
   useFrame((state, delta) => {
-    const { gl, viewport, pointer, camera } = state;
-    const v = viewport.getCurrentViewport(camera, [0, 0, 15]);
+    const { gl, pointer, camera } = state;
+    const v = state.viewport.getCurrentViewport(camera, [0, 0, 15]);
 
     const destX = followPointer ? (pointer.x * v.width) / 2 : 0;
     const destY = lockToBottom ? -v.height / 2 + 0.2 : followPointer ? (pointer.y * v.height) / 2 : 0;
@@ -65,6 +73,7 @@ const ModeWrapper = memo(function ModeWrapper({
       }
     }
 
+    // Capture everything inside the scene portal into the texture buffer
     gl.setRenderTarget(buffer);
     gl.render(scene, camera);
     gl.setRenderTarget(null);
@@ -83,10 +92,12 @@ const ModeWrapper = memo(function ModeWrapper({
         <mesh ref={ref} scale={scale ?? 0.25} rotation-x={Math.PI / 2} geometry={nodes[geometryKey].geometry} {...props}>
           <MeshTransmissionMaterial
             buffer={buffer.texture}
-            ior={ior ?? 1.15}
-            thickness={thickness ?? 5}
-            anisotropy={anisotropy ?? 0.01}
-            chromaticAberration={chromaticAberration ?? 0.1}
+            ior={ior ?? 1.18}
+            thickness={thickness ?? 6}
+            anisotropy={anisotropy ?? 0.02}
+            chromaticAberration={chromaticAberration ?? 0.15}
+            transmission={1}
+            roughness={0.0}
             {...extraMat}
           />
         </mesh>
@@ -113,15 +124,5 @@ function Bar({ modeProps = {}, ...p }) {
     attenuationColor: '#ffffff',
     attenuationDistance: 0.25
   };
-
-  return (
-    <ModeWrapper
-      glb="/assets/3d/bar.glb"
-      geometryKey="Cube"
-      lockToBottom
-      followPointer={false}
-      modeProps={{ ...defaultMat, ...modeProps }}
-      {...p}
-    />
-  );
+  return <ModeWrapper glb="/assets/3d/bar.glb" geometryKey="Cube" lockToBottom followPointer={false} modeProps={{ ...defaultMat, ...modeProps }} {...p} />;
 }
