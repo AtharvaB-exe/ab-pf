@@ -44,7 +44,6 @@ const ModeWrapper = memo(function ModeWrapper({
   const [scene] = useState(() => new THREE.Scene());
   const geoWidthRef = useRef(1);
 
-  // Dynamic texture generated directly from your live HTML elements
   const [htmlTexture, setHtmlTexture] = useState(null);
 
   useEffect(() => {
@@ -55,42 +54,40 @@ const ModeWrapper = memo(function ModeWrapper({
     }
   }, [nodes, geometryKey]);
 
-  // Real-Time Canvas Mirror Map: Captures text pixels to stream directly to WebGL
   useEffect(() => {
-    if (!htmlRef?.current) return;
-
     const canvas = document.createElement('canvas');
-    canvas.width = window.innerWidth * window.devicePixelRatio;
-    canvas.height = window.innerHeight * window.devicePixelRatio;
-    const ctx = canvas.getContext('2d');
-
     const updateTextureFromHTML = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
-
-      // Render custom vector copies of our text cleanly into the shader grid
-      ctx.font = '900 11vw Inter, sans-serif';
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
-      ctx.textBaseline = 'top';
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = window.innerWidth * dpr;
+      canvas.height = window.innerHeight * dpr;
+      const ctx = canvas.getContext('2d');
       
-      const paddingLeft = window.innerWidth * 0.1;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.scale(dpr, dpr);
+
+      // Clean padding weights mimicking standard container metrics
+      const paddingLeft = window.innerWidth > 1024 ? window.innerWidth * 0.12 : window.innerWidth * 0.06;
       const paddingTop = window.innerHeight * 0.28;
 
+      ctx.font = '900 11vw Inter, sans-serif';
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.98)';
+      ctx.textBaseline = 'top';
+      
       ctx.fillText('ATHARVA', paddingLeft, paddingTop);
-      ctx.fillText('BULBULE', paddingLeft, paddingTop + (window.innerHeight * 0.11));
+      ctx.fillText('BULBULE', paddingLeft, paddingTop + (window.innerHeight * 0.105));
 
-      ctx.font = '700 0.75rem Inter, sans-serif';
+      ctx.font = '700 0.8rem Inter, sans-serif';
       ctx.fillStyle = '#22d3ee';
-      ctx.fillText('UI/UX DESIGNER • FRONTEND DEVELOPER', paddingLeft, paddingTop - 40);
+      ctx.fillText('UI/UX DESIGNER • FRONTEND DEVELOPER', paddingLeft, paddingTop - 45);
 
-      ctx.font = '500 1.25rem Inter, sans-serif';
-      ctx.fillStyle = '#e4e4e7';
+      ctx.font = '500 1.2rem Inter, sans-serif';
+      ctx.fillStyle = '#d4d4d8';
       
       const pText = 'Crafting cinematic digital experiences through design, code, and visual storytelling.';
-      const maxWidth = window.innerWidth * 0.4;
+      const maxWidth = window.innerWidth > 768 ? window.innerWidth * 0.45 : window.innerWidth * 0.8;
       let words = pText.split(' ');
       let line = '';
-      let y = paddingTop + (window.innerHeight * 0.24);
+      let y = paddingTop + (window.innerHeight * 0.23);
 
       for(let n = 0; n < words.length; n++) {
         let testLine = line + words[n] + ' ';
@@ -132,7 +129,6 @@ const ModeWrapper = memo(function ModeWrapper({
       }
     }
 
-    // Capture the environment background pass + mirrored vector texts completely inside the buffer map
     gl.setRenderTarget(buffer);
     gl.render(scene, camera);
     gl.setRenderTarget(null);
@@ -155,13 +151,11 @@ const ModeWrapper = memo(function ModeWrapper({
         scene
       )}
 
-      {/* Renders the combined background + text image texture behind the lens */}
       <mesh scale={[vp.width, vp.height, 1]}>
         <planeGeometry />
         <meshBasicMaterial map={buffer.texture} transparent />
       </mesh>
       
-      {/* The 3D physical crystal lens refracts EVERYTHING on the plane maps */}
       {nodes[geometryKey] && (
         <mesh ref={ref} scale={scale ?? 0.24} rotation-x={Math.PI / 2} geometry={nodes[geometryKey].geometry} {...props}>
           <MeshTransmissionMaterial
