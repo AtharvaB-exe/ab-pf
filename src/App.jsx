@@ -20,7 +20,7 @@ export default function App() {
   return (
     <div className="relative w-full h-screen bg-[#050505] overflow-hidden select-none">
       
-      {/* 3D Canvas Refraction Engine */}
+      {/* 3D WebGL Canvas Layer */}
       <div className="absolute inset-0 z-0 w-full h-full pointer-events-none">
         <FluidGlass 
           mode="lens" 
@@ -38,11 +38,10 @@ export default function App() {
 
       <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/10 via-transparent to-black/40 pointer-events-none" />
 
-      {/* HTML Interactive Button Overlay Layer */}
+      {/* HTML Interactive Capture Sheet Overlay */}
       <main ref={htmlContentRef} className="absolute inset-0 z-20 min-h-screen flex items-center justify-center">
         <div className="max-w-7xl mx-auto px-8 md:px-16 w-full py-20 text-white flex flex-col items-center justify-center">
           
-          {/* Transparent structural block keeping layout spacing intact */}
           <div className="opacity-0 pointer-events-none text-center">
             <p className="text-cyan-400 uppercase tracking-[0.5em] text-xs font-bold mb-6">
               UI/UX DESIGNER • FRONTEND DEVELOPER
@@ -58,7 +57,7 @@ export default function App() {
             </p>
           </div>
 
-          {/* Centered Glowing Border Component */}
+          {/* Centered Glowing Border Card Core Container */}
           <div className="mt-14 pointer-events-auto">
             <BorderGlow
               edgeSensitivity={40}
@@ -72,10 +71,11 @@ export default function App() {
               colors={['#22d3ee', '#38bdf8', '#c084fc']}
             >
               <button 
-                onClick={() => console.log("Explore work clicked!")}
+                onClick={() => console.log("Enter action link clicked!")}
                 className="px-8 py-4 bg-transparent text-sm font-semibold tracking-wider text-white cursor-pointer select-none border border-transparent rounded-full focus:outline-none transition-transform active:scale-95"
+                style={{ minWidth: '150px', minHeight: '48px' }}
               >
-                Explore Work
+                Enter
               </button>
             </BorderGlow>
           </div>

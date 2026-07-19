@@ -67,7 +67,6 @@ const ModeWrapper = memo(function ModeWrapper({
 
       const isDesktop = window.innerWidth > 1024;
       
-      // Center align coordinate points inside the text draw frame
       const paddingLeft = window.innerWidth / 2;
       const paddingTop = window.innerHeight * 0.20;
       
@@ -115,6 +114,28 @@ const ModeWrapper = memo(function ModeWrapper({
         }
       }
       ctx.fillText(structuredLine, paddingLeft, currentParagraphY);
+
+      // 4. Draw Vector Component Button (Changed text tracking matrix context here)
+      const buttonY = currentParagraphY + paragraphFontSize * 2 + 10;
+      const btnWidth = 150;
+      const btnHeight = 48;
+      const radius = 24;
+
+      ctx.beginPath();
+      ctx.roundRect(paddingLeft - btnWidth / 2, buttonY, btnWidth, btnHeight, radius);
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+      ctx.fill();
+
+      ctx.font = '600 14px Inter, sans-serif';
+      ctx.fillStyle = '#ffffff';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('Enter', paddingLeft, buttonY + btnHeight / 2);
+      
+      ctx.textAlign = 'left';
 
       const texture = new THREE.CanvasTexture(canvas);
       texture.needsUpdate = true;
