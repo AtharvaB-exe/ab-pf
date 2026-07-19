@@ -3,10 +3,12 @@ import FluidBlobCursor from "./components/FluidBlobCursor";
 export default function App() {
   return (
     <>
+      {/* Liquid Glass Dynamic Fluid Engine */}
       <FluidBlobCursor />
 
       <main className="min-h-screen text-white overflow-hidden relative selection:bg-white/20">
         
+        {/* Your Background Image (Served right out of the public folder) */}
         <div
           className="fixed inset-0 bg-cover bg-center transform scale-105 pointer-events-none"
           style={{
@@ -14,8 +16,10 @@ export default function App() {
           }}
         />
 
+        {/* Cinematic Atmospheric Vignette Layer */}
         <div className="fixed inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/50 pointer-events-none" />
 
+        {/* Hero Content Layer */}
         <section className="relative h-screen flex items-center z-10">
           <div className="max-w-7xl mx-auto px-8 md:px-16 w-full">
             
