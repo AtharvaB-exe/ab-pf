@@ -18,7 +18,13 @@ body {
   cursor: none !important;
 }
 
-/* ===== iOS LIQUID GLASS — GLOW FREE & CINEMATIC SMOOTH ===== */
+/* ===== TRUE PHYSICAL LIQUID GLASS WARPING ENGINE ===== */
+
+.hidden-engine-filters {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
 
 .fluid-cursor-system {
   position: fixed;
@@ -31,23 +37,47 @@ body {
   position: absolute;
   top: 0;
   left: 0;
-  width: 130px;
-  height: 130px;
+  width: 150px; /* Big premium liquid surface space area */
+  height: 150px;
   pointer-events: none;
   will-change: transform, border-radius;
   
-  /* Pure physical background refraction blur without color interference */
-  backdrop-filter: blur(24px) saturate(180%) contrast(100%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%) contrast(100%);
+  /* Link CSS directly into the hardware-accelerated SVG physical displacement lens */
+  filter: url('#physical-glass-warp');
   
-  /* Soft feathered perimeter blend edge */
-  filter: blur(6px); 
+  /* High fidelity premium frosted glass refraction */
+  backdrop-filter: blur(20px) saturate(160%) contrast(100%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%) contrast(100%);
   
-  /* Absolute transparency core — REMOVED all white gradients/glow maps */
-  background: transparent;
+  /* Crystal clear transparency core - absolutely NO solid white background color/glow */
+  background: radial-gradient(
+    circle at 35% 35%,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(255, 255, 255, 0.01) 60%,
+    rgba(255, 255, 255, 0) 100%
+  );
   
-  /* Subtle glass depth bounding anchors without hot glow spots */
+  /* Ultra-thin hyper-realistic clear glass lip edge */
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  
+  /* Physical specular lighting shadows to define premium iOS lens depth */
   box-shadow: 
-    inset 0 4px 12px rgba(255, 255, 255, 0.08),
-    inset 0 -4px 12px rgba(0, 0, 0, 0.15);
+    inset 0 6px 14px rgba(255, 255, 255, 0.18),
+    inset 0 -6px 14px rgba(0, 0, 0, 0.1),
+    0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+/* Faint interior liquid specular shine */
+.glass-edge-sheen {
+  position: absolute;
+  inset: 4px;
+  border-radius: inherit;
+  background: radial-gradient(
+    circle at 25% 25%,
+    rgba(255, 255, 255, 0.35) 0%,
+    rgba(255, 255, 255, 0) 50%
+  );
+  filter: blur(2px);
+  opacity: 0.7;
+  pointer-events: none;
 }
