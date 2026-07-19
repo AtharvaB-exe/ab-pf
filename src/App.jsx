@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from "react";
 import FluidGlass from "./components/FluidGlass";
 import BorderGlow from "./components/BorderGlow";
 import ProfileCard from "./components/ProfileCard";
-import Lanyard from "./components/Lanyard";
 
 export default function App() {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
