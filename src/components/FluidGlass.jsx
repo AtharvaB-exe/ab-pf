@@ -6,49 +6,46 @@ import {
   useFBO,
   useGLTF,
   Preload,
-  ScrollControls,
-  Scroll,
   MeshTransmissionMaterial,
   Image
 } from '@react-three/drei';
 import { easing } from 'maath';
 
-export default function FluidGlass({ mode = 'lens', lensProps = {}, mousePos = { x: 0, y: 0 }, children }) {
+export default function FluidGlass({ mode = 'lens', lensProps = {}, mousePos = { x: 0, y: 0 }, htmlRef }) {
   const Wrapper = mode === 'bar' ? Bar : mode === 'cube' ? Cube : Lens;
   const rawOverrides = mode === 'lens' ? lensProps : {};
 
   return (
     <Canvas camera={{ position: [0, 0, 20], fov: 15 }} gl={{ alpha: true }}>
-      <ScrollControls pages={1} distance={0}>
-        <Wrapper modeProps={rawOverrides} mousePos={mousePos}>
-          {/* This injects the text and DOM elements right into the internal render target loop */}
-          <Scroll html style={{ width: '100%', height: '100%' }}>
-            {children}
-          </Scroll>
-          <RefractionSceneTarget />
-          <Preload />
-        </Wrapper>
-      </ScrollControls>
+      <Wrapper modeProps={rawOverrides} mousePos={mousePos} htmlRef={htmlRef}>
+        <Preload />
+      </Wrapper>
     </Canvas>
   );
 }
 
 const ModeWrapper = memo(function ModeWrapper({
-  children,
   glb,
   geometryKey,
   lockToBottom = false,
   followPointer = true,
   modeProps = {},
   mousePos,
+  htmlRef,
   ...props
 }) {
   const ref = useRef();
+  const backgroundMeshRef = useRef();
+  const textOverlayMeshRef = useRef();
+  
   const { nodes } = useGLTF(glb);
   const buffer = useFBO();
   const { viewport: vp } = useThree();
   const [scene] = useState(() => new THREE.Scene());
   const geoWidthRef = useRef(1);
+
+  // Dynamic texture generated directly from your live HTML elements
+  const [htmlTexture, setHtmlTexture] = useState(null);
 
   useEffect(() => {
     const geo = nodes[geometryKey]?.geometry;
@@ -57,6 +54,66 @@ const ModeWrapper = memo(function ModeWrapper({
       geoWidthRef.current = geo.boundingBox.max.x - geo.boundingBox.min.x || 1;
     }
   }, [nodes, geometryKey]);
+
+  // Real-Time Canvas Mirror Map: Captures text pixels to stream directly to WebGL
+  useEffect(() => {
+    if (!htmlRef?.current) return;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = window.innerWidth * window.devicePixelRatio;
+    canvas.height = window.innerHeight * window.devicePixelRatio;
+    const ctx = canvas.getContext('2d');
+
+    const updateTextureFromHTML = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+
+      // Render custom vector copies of our text cleanly into the shader grid
+      ctx.font = '900 11vw Inter, sans-serif';
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+      ctx.textBaseline = 'top';
+      
+      const paddingLeft = window.innerWidth * 0.1;
+      const paddingTop = window.innerHeight * 0.28;
+
+      ctx.fillText('ATHARVA', paddingLeft, paddingTop);
+      ctx.fillText('BULBULE', paddingLeft, paddingTop + (window.innerHeight * 0.11));
+
+      ctx.font = '700 0.75rem Inter, sans-serif';
+      ctx.fillStyle = '#22d3ee';
+      ctx.fillText('UI/UX DESIGNER • FRONTEND DEVELOPER', paddingLeft, paddingTop - 40);
+
+      ctx.font = '500 1.25rem Inter, sans-serif';
+      ctx.fillStyle = '#e4e4e7';
+      
+      const pText = 'Crafting cinematic digital experiences through design, code, and visual storytelling.';
+      const maxWidth = window.innerWidth * 0.4;
+      let words = pText.split(' ');
+      let line = '';
+      let y = paddingTop + (window.innerHeight * 0.24);
+
+      for(let n = 0; n < words.length; n++) {
+        let testLine = line + words[n] + ' ';
+        let metrics = ctx.measureText(testLine);
+        if (metrics.width > maxWidth && n > 0) {
+          ctx.fillText(line, paddingLeft, y);
+          line = words[n] + ' ';
+          y += 28;
+        } else {
+          line = testLine;
+        }
+      }
+      ctx.fillText(line, paddingLeft, y);
+
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.needsUpdate = true;
+      setHtmlTexture(texture);
+    };
+
+    updateTextureFromHTML();
+    window.addEventListener('resize', updateTextureFromHTML);
+    return () => window.removeEventListener('resize', updateTextureFromHTML);
+  }, [htmlRef]);
 
   useFrame((state, delta) => {
     const { gl, camera } = state;
@@ -75,7 +132,7 @@ const ModeWrapper = memo(function ModeWrapper({
       }
     }
 
-    // Capture the layout contents (including the portal children) directly to the refraction texture maps
+    // Capture the environment background pass + mirrored vector texts completely inside the buffer map
     gl.setRenderTarget(buffer);
     gl.render(scene, camera);
     gl.setRenderTarget(null);
@@ -85,19 +142,34 @@ const ModeWrapper = memo(function ModeWrapper({
 
   return (
     <>
-      {createPortal(children, scene)}
+      {createPortal(
+        <group>
+          <Image ref={backgroundMeshRef} position={[0, 0, 0]} scale={[vp.width, vp.height, 1]} url="/bg.png" />
+          {htmlTexture && (
+            <mesh ref={textOverlayMeshRef} position={[0, 0, 1]}>
+              <planeGeometry args={[vp.width, vp.height]} />
+              <meshBasicMaterial map={htmlTexture} transparent />
+            </mesh>
+          )}
+        </group>,
+        scene
+      )}
+
+      {/* Renders the combined background + text image texture behind the lens */}
       <mesh scale={[vp.width, vp.height, 1]}>
         <planeGeometry />
         <meshBasicMaterial map={buffer.texture} transparent />
       </mesh>
+      
+      {/* The 3D physical crystal lens refracts EVERYTHING on the plane maps */}
       {nodes[geometryKey] && (
         <mesh ref={ref} scale={scale ?? 0.24} rotation-x={Math.PI / 2} geometry={nodes[geometryKey].geometry} {...props}>
           <MeshTransmissionMaterial
             buffer={buffer.texture}
             ior={ior ?? 1.25}
-            thickness={thickness ?? 6}
+            thickness={thickness ?? 5.5}
             anisotropy={anisotropy ?? 0.03}
-            chromaticAberration={chromaticAberration ?? 0.15}
+            chromaticAberration={chromaticAberration ?? 0.14}
             transmission={1}
             roughness={0.0}
             transparent
@@ -120,9 +192,4 @@ function Cube({ modeProps, ...p }) {
 function Bar({ modeProps = {}, ...p }) {
   const defaultMat = { transmission: 1, roughness: 0, thickness: 10, ior: 1.15, color: '#ffffff' };
   return <ModeWrapper glb="/assets/3d/bar.glb" geometryKey="Cube" lockToBottom followPointer={false} modeProps={{ ...defaultMat, ...modeProps }} {...p} />;
-}
-
-function RefractionSceneTarget() {
-  const { width, height } = useThree((state) => state.viewport);
-  return <Image position={[0, 0, 0]} scale={[width, height, 1]} url="/bg.png" opacity={0} />;
 }

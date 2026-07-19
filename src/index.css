@@ -22,8 +22,3 @@ canvas {
   width: 100% !important;
   height: 100% !important;
 }
-
-/* Fix for Drei Drei scroll containers inside Tailwind layers */
-.shared-scroll-container div {
-  pointer-events: auto !important;
-}
