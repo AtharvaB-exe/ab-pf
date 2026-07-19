@@ -66,7 +66,6 @@ const ModeWrapper = memo(function ModeWrapper({
       ctx.scale(dpr, dpr);
 
       const isDesktop = window.innerWidth > 1024;
-      
       const paddingLeft = window.innerWidth / 2;
       const paddingTop = window.innerHeight * 0.20;
       
@@ -114,6 +113,34 @@ const ModeWrapper = memo(function ModeWrapper({
         }
       }
       ctx.fillText(structuredLine, paddingLeft, currentParagraphY);
+
+      // 4. Mirror the Glow Button into the 3D scene so the glass lens can grab its pixels
+      const buttonY = currentParagraphY + paragraphFontSize * 2 + 10;
+      const btnWidth = 150;
+      const btnHeight = 48;
+      const radius = 24;
+
+      // Draw the stylized button body container behind the glass lens
+      ctx.beginPath();
+      ctx.roundRect(paddingLeft - btnWidth / 2, buttonY, btnWidth, btnHeight, radius);
+      ctx.strokeStyle = 'rgba(34, 211, 238, 0.4)'; // Cyan border match
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      
+      // Dynamic ambient mesh linear gradient representation inside the 3D loop
+      const gradient = ctx.createLinearGradient(paddingLeft - btnWidth/2, buttonY, paddingLeft + btnWidth/2, buttonY);
+      gradient.addColorStop(0, 'rgba(34, 211, 238, 0.15)');
+      gradient.addColorStop(0.5, 'rgba(56, 189, 248, 0.15)');
+      gradient.addColorStop(1, 'rgba(192, 132, 252, 0.15)');
+      ctx.fillStyle = gradient;
+      ctx.fill();
+
+      // Render the matching button label copy vectors cleanly
+      ctx.font = '600 14px Inter, sans-serif';
+      ctx.fillStyle = '#ffffff';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('Enter', paddingLeft, buttonY + btnHeight / 2);
       
       ctx.textAlign = 'left';
 

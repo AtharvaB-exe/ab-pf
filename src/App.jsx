@@ -20,7 +20,7 @@ export default function App() {
   return (
     <div className="relative w-full h-screen bg-[#050505] overflow-hidden select-none">
       
-      {/* 3D Canvas Refraction Layer Core */}
+      {/* 1. 3D WebGL Fluid Lens Canvas Layer */}
       <div className="absolute inset-0 z-0 w-full h-full pointer-events-none">
         <FluidGlass 
           mode="lens" 
@@ -36,13 +36,14 @@ export default function App() {
         />
       </div>
 
+      {/* 2. Premium Ambient Dark Vignette Pass */}
       <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/10 via-transparent to-black/40 pointer-events-none" />
 
-      {/* Primary HTML Active Content Layout */}
+      {/* 3. HTML Layout Interface Container */}
       <main ref={htmlContentRef} className="absolute inset-0 z-20 min-h-screen flex items-center justify-center">
         <div className="max-w-7xl mx-auto px-8 md:px-16 w-full py-20 text-white flex flex-col items-center justify-center">
           
-          {/* Transparent bounds keep alignment variables completely uniform */}
+          {/* Transparent structural copy block anchors exact proportions down to the pixel grid */}
           <div className="opacity-0 pointer-events-none text-center">
             <p className="text-cyan-400 uppercase tracking-[0.5em] text-xs font-bold mb-6">
               UI/UX DESIGNER • FRONTEND DEVELOPER
@@ -58,22 +59,23 @@ export default function App() {
             </p>
           </div>
 
-          {/* Centered Glowing Border Component Wrapper */}
+          {/* 4. Interactive React Bits BorderGlow Overlay Component */}
           <div className="mt-14 pointer-events-auto">
             <BorderGlow
               edgeSensitivity={40}
               glowColor="190 90% 60%"
-              backgroundColor="rgba(255, 255, 255, 0.03)"
+              backgroundColor="transparent" // Lets the 3D canvas show through perfectly
               borderRadius={9999}
               glowRadius={25}
               glowIntensity={1.2}
               coneSpread={30}
               animated={true}
               colors={['#22d3ee', '#38bdf8', '#c084fc']}
+              className="hover:scale-105 transition-transform duration-300"
             >
               <button 
-                onClick={() => console.log("Enter clicked!")}
-                className="px-8 py-4 bg-transparent text-sm font-semibold tracking-wider text-white cursor-pointer select-none border border-transparent rounded-full focus:outline-none transition-transform active:scale-95"
+                onClick={() => console.log("Enter action link triggered successfully!")}
+                className="px-8 py-4 bg-transparent text-sm font-semibold tracking-wider text-transparent cursor-pointer select-none border border-transparent rounded-full focus:outline-none transition-transform active:scale-95"
                 style={{ minWidth: '150px', minHeight: '48px' }}
               >
                 Enter

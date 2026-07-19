@@ -144,8 +144,8 @@ export default function BorderGlow({
           isolation: isolate;
           transform: translate3d(0, 0, 0.01px);
           display: grid;
-          border: 1px solid rgb(255 255 255 / 15%);
-          background: var(--card-bg, #120F17);
+          border: 1px solid rgb(255 255 255 / 10%);
+          background: var(--card-bg, transparent);
           overflow: visible;
         }
         .border-glow-card::before,
@@ -167,7 +167,7 @@ export default function BorderGlow({
         .border-glow-card::before {
           border: 1px solid transparent;
           background:
-            linear-gradient(var(--card-bg, #120F17) 0 100%) padding-box,
+            linear-gradient(var(--card-bg, transparent) 0 100%) padding-box,
             linear-gradient(rgb(255 255 255 / 0%) 0% 100%) border-box,
             var(--gradient-one) border-box, var(--gradient-two) border-box,
             var(--gradient-three) border-box, var(--gradient-four) border-box,
@@ -204,9 +204,9 @@ export default function BorderGlow({
           inset: var(--glow-padding);
           border-radius: inherit;
           box-shadow:
-            inset 0 0 0 1px var(--glow-color, hsl(40deg 80% 80% / 100%)),
-            0 0 15px 0 var(--glow-color-30, hsl(40deg 80% 80% / 30%)),
-            0 0 25px 2px var(--glow-color-20, hsl(40deg 80% 80% / 20%));
+            inset 0 0 0 1px var(--glow-color, hsl(190deg 90% 60% / 100%)),
+            0 0 15px 0 var(--glow-color-30, hsl(190deg 90% 60% / 30%)),
+            0 0 25px 2px var(--glow-color-20, hsl(190deg 90% 60% / 20%));
         }
         .border-glow-inner {
           display: flex;
