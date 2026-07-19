@@ -11,13 +11,13 @@ import {
 } from '@react-three/drei';
 import { easing } from 'maath';
 
-export default function FluidGlass({ mode = 'lens', lensProps = {}, mousePos = { x: 0, y: 0 }, htmlRef, onParagraphBottom }) {
+export default function FluidGlass({ mode = 'lens', lensProps = {}, mousePos = { x: 0, y: 0 }, htmlRef }) {
   const Wrapper = mode === 'bar' ? Bar : mode === 'cube' ? Cube : Lens;
   const rawOverrides = mode === 'lens' ? lensProps : {};
 
   return (
     <Canvas camera={{ position: [0, 0, 20], fov: 15 }} gl={{ alpha: true }}>
-      <Wrapper modeProps={rawOverrides} mousePos={mousePos} htmlRef={htmlRef} onParagraphBottom={onParagraphBottom}>
+      <Wrapper modeProps={rawOverrides} mousePos={mousePos} htmlRef={htmlRef}>
         <Preload />
       </Wrapper>
     </Canvas>
@@ -32,7 +32,6 @@ const ModeWrapper = memo(function ModeWrapper({
   modeProps = {},
   mousePos,
   htmlRef,
-  onParagraphBottom,
   ...props
 }) {
   const ref = useRef();
@@ -67,16 +66,20 @@ const ModeWrapper = memo(function ModeWrapper({
       ctx.scale(dpr, dpr);
 
       const isDesktop = window.innerWidth > 1024;
-      const paddingLeft = isDesktop ? window.innerWidth * 0.12 : window.innerWidth * 0.06;
-      const paddingTop = window.innerHeight * 0.25;
+      
+      // Center align coordinate points inside the text draw frame
+      const paddingLeft = window.innerWidth / 2;
+      const paddingTop = window.innerHeight * 0.20;
+      
+      ctx.textAlign = 'center';
 
-      // 1. Tagline Element
+      // 1. Render Subheader Tagline
       ctx.font = '700 13px Inter, sans-serif';
       ctx.fillStyle = '#22d3ee';
       ctx.textBaseline = 'top';
       ctx.fillText('UI/UX DESIGNER • FRONTEND DEVELOPER', paddingLeft, paddingTop);
 
-      // 2. Main Title Layout Sizing
+      // 2. Render Main Big Typography Headline Stack
       const fontSizePX = window.innerWidth * 0.11; 
       ctx.font = `900 ${fontSizePX}px Inter, sans-serif`;
       ctx.fillStyle = 'rgba(255, 255, 255, 0.98)';
@@ -88,13 +91,13 @@ const ModeWrapper = memo(function ModeWrapper({
       ctx.fillText('ATHARVA', paddingLeft, titleRow1Y);
       ctx.fillText('BULBULE', paddingLeft, titleRow2Y);
 
-      // 3. Paragraph Container
+      // 3. Render Bottom Paragraph Box
       const paragraphFontSize = isDesktop ? 20 : 16;
       ctx.font = `500 ${paragraphFontSize}px Inter, sans-serif`;
       ctx.fillStyle = '#d4d4d8';
       
       const bodyCopyText = 'Crafting cinematic digital experiences through design, code, and visual storytelling.';
-      const maxTextWidth = isDesktop ? window.innerWidth * 0.45 : window.innerWidth * 0.8;
+      const maxTextWidth = isDesktop ? window.innerWidth * 0.50 : window.innerWidth * 0.85;
       let wordsArray = bodyCopyText.split(' ');
       let structuredLine = '';
       
@@ -113,11 +116,6 @@ const ModeWrapper = memo(function ModeWrapper({
       }
       ctx.fillText(structuredLine, paddingLeft, currentParagraphY);
 
-      // Calculate the bottom point of text and lift it up to App.jsx
-      if (onParagraphBottom) {
-        onParagraphBottom(currentParagraphY + (paragraphFontSize * 1.5));
-      }
-
       const texture = new THREE.CanvasTexture(canvas);
       texture.needsUpdate = true;
       setHtmlTexture(texture);
@@ -126,7 +124,7 @@ const ModeWrapper = memo(function ModeWrapper({
     updateTextureFromHTML();
     window.addEventListener('resize', updateTextureFromHTML);
     return () => window.removeEventListener('resize', updateTextureFromHTML);
-  }, [htmlRef, onParagraphBottom]);
+  }, [htmlRef]);
 
   useFrame((state, delta) => {
     const { gl, camera } = state;
