@@ -11,12 +11,9 @@ export default function App() {
 
   useEffect(() => {
     const handleGlobalMouseMove = (e) => {
-      // 1. Normalized values for Three.js engine processing
       const x = (e.clientX / window.innerWidth) * 2 - 1;
       const y = -(e.clientY / window.innerHeight) * 2 + 1;
       setMousePos({ x, y });
-      
-      // 2. Absolute coordinate spacing values for tracking indicator node styling
       setRawCursor({ x: e.clientX, y: e.clientY });
     };
 
@@ -46,7 +43,7 @@ export default function App() {
       {/* Ambient Lighting Vignette */}
       <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/20 via-transparent to-black/50 pointer-events-none" />
 
-      {/* 3D WebGL Fluid Lens Canvas layer positioned behind interactive modules */}
+      {/* 3D WebGL Fluid Lens Canvas layer */}
       {!isEntered && (
         <div className="absolute inset-0 z-20 w-full h-full pointer-events-none">
           <FluidGlass 
@@ -116,8 +113,8 @@ export default function App() {
               handle="atharvabulbule"
               status="Available for Projects"
               contactText="Get In Touch"
-              avatarUrl="/avatar.jpg" /* Automatically loads your profile photo here */
-              miniAvatarUrl="/avatar.jpg"
+              avatarUrl="/avatar.png" /* Changed path to .png */
+              miniAvatarUrl="/avatar.png" /* Changed path to .png */
               enableTilt={true}
               behindGlowEnabled={true}
               behindGlowColor="rgba(34, 211, 238, 0.4)"
