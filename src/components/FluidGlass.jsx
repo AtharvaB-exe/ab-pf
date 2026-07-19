@@ -65,42 +65,55 @@ const ModeWrapper = memo(function ModeWrapper({
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.scale(dpr, dpr);
 
-      // Clean padding weights mimicking standard container metrics
-      const paddingLeft = window.innerWidth > 1024 ? window.innerWidth * 0.12 : window.innerWidth * 0.06;
-      const paddingTop = window.innerHeight * 0.28;
+      const isDesktop = window.innerWidth > 1024;
+      const paddingLeft = isDesktop ? window.innerWidth * 0.12 : window.innerWidth * 0.06;
+      const paddingTop = window.innerHeight * 0.25;
 
-      ctx.font = '900 11vw Inter, sans-serif';
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.98)';
-      ctx.textBaseline = 'top';
-      
-      ctx.fillText('ATHARVA', paddingLeft, paddingTop);
-      ctx.fillText('BULBULE', paddingLeft, paddingTop + (window.innerHeight * 0.105));
-
-      ctx.font = '700 0.8rem Inter, sans-serif';
+      // 1. Tagline Element
+      ctx.font = '700 13px Inter, sans-serif';
       ctx.fillStyle = '#22d3ee';
-      ctx.fillText('UI/UX DESIGNER • FRONTEND DEVELOPER', paddingLeft, paddingTop - 45);
+      ctx.textBaseline = 'top';
+      ctx.fillText('UI/UX DESIGNER • FRONTEND DEVELOPER', paddingLeft, paddingTop);
 
-      ctx.font = '500 1.2rem Inter, sans-serif';
+      // 2. Main Title Layout Sizing Calculations
+      const fontSizePX = window.innerWidth * 0.11; 
+      ctx.font = `900 ${fontSizePX}px Inter, sans-serif`;
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.98)';
+      
+      // Calculate a highly deliberate layout gap to force them vertically apart
+      const verticalLineHeight = fontSizePX * 0.90; 
+      
+      const titleRow1Y = paddingTop + 45; 
+      const titleRow2Y = titleRow1Y + verticalLineHeight;
+
+      ctx.fillText('ATHARVA', paddingLeft, titleRow1Y);
+      ctx.fillText('BULBULE', paddingLeft, titleRow2Y);
+
+      // 3. Paragraph Container Block
+      const paragraphFontSize = isDesktop ? 20 : 16;
+      ctx.font = `500 ${paragraphFontSize}px Inter, sans-serif`;
       ctx.fillStyle = '#d4d4d8';
       
-      const pText = 'Crafting cinematic digital experiences through design, code, and visual storytelling.';
-      const maxWidth = window.innerWidth > 768 ? window.innerWidth * 0.45 : window.innerWidth * 0.8;
-      let words = pText.split(' ');
-      let line = '';
-      let y = paddingTop + (window.innerHeight * 0.23);
+      const bodyCopyText = 'Crafting cinematic digital experiences through design, code, and visual storytelling.';
+      const maxTextWidth = isDesktop ? window.innerWidth * 0.45 : window.innerWidth * 0.8;
+      let wordsArray = bodyCopyText.split(' ');
+      let structuredLine = '';
+      
+      // Safe dynamic distance under the second row layout
+      let currentParagraphY = titleRow2Y + fontSizePX + 25; 
 
-      for(let n = 0; n < words.length; n++) {
-        let testLine = line + words[n] + ' ';
-        let metrics = ctx.measureText(testLine);
-        if (metrics.width > maxWidth && n > 0) {
-          ctx.fillText(line, paddingLeft, y);
-          line = words[n] + ' ';
-          y += 28;
+      for(let i = 0; i < wordsArray.length; i++) {
+        let testTextLine = structuredLine + wordsArray[i] + ' ';
+        let measurementMetrics = ctx.measureText(testTextLine);
+        if (measurementMetrics.width > maxTextWidth && i > 0) {
+          ctx.fillText(structuredLine, paddingLeft, currentParagraphY);
+          structuredLine = wordsArray[i] + ' ';
+          currentParagraphY += paragraphFontSize * 1.5; 
         } else {
-          line = testLine;
+          structuredLine = testTextLine;
         }
       }
-      ctx.fillText(line, paddingLeft, y);
+      ctx.fillText(structuredLine, paddingLeft, currentParagraphY);
 
       const texture = new THREE.CanvasTexture(canvas);
       texture.needsUpdate = true;
