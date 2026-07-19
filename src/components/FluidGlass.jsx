@@ -10,16 +10,14 @@ import {
 } from '@react-three/drei';
 import { easing } from 'maath';
 
-export default function FluidGlass({ mode = 'lens', lensProps = {}, barProps = {}, cubeProps = {} }) {
+export default function FluidGlass({ mode = 'lens', lensProps = {}, children }) {
   const Wrapper = mode === 'bar' ? Bar : mode === 'cube' ? Cube : Lens;
-  const rawOverrides = mode === 'bar' ? barProps : mode === 'cube' ? cubeProps : lensProps;
-
-  const { ...modeProps } = rawOverrides;
+  const rawOverrides = mode === 'lens' ? lensProps : {};
 
   return (
     <Canvas camera={{ position: [0, 0, 20], fov: 15 }} gl={{ alpha: true }}>
-      <Wrapper modeProps={modeProps}>
-        {/* We keep the scene rendering loop active, purely targeting the glass overlay calculations */}
+      <Wrapper modeProps={rawOverrides}>
+        {children}
         <Preload />
       </Wrapper>
     </Canvas>
@@ -63,14 +61,13 @@ const ModeWrapper = memo(function ModeWrapper({
       if (modeProps.scale == null) {
         const maxWorld = v.width * 0.9;
         const desired = maxWorld / geoWidthRef.current;
-        ref.current.scale.setScalar(Math.min(0.22, desired)); // Fixed lens scale factor
+        ref.current.scale.setScalar(Math.min(0.25, desired));
       }
     }
 
     gl.setRenderTarget(buffer);
     gl.render(scene, camera);
     gl.setRenderTarget(null);
-    gl.setClearColor(0x000000, 0); // Preserves absolute transparency alpha channels
   });
 
   const { scale, ior, thickness, anisotropy, chromaticAberration, ...extraMat } = modeProps;
@@ -80,19 +77,16 @@ const ModeWrapper = memo(function ModeWrapper({
       {createPortal(children, scene)}
       <mesh scale={[vp.width, vp.height, 1]}>
         <planeGeometry />
-        <meshBasicMaterial map={buffer.texture} transparent opacity={0} />
+        <meshBasicMaterial map={buffer.texture} transparent />
       </mesh>
       {nodes[geometryKey] && (
-        <mesh ref={ref} scale={scale ?? 0.22} rotation-x={Math.PI / 2} geometry={nodes[geometryKey].geometry} {...props}>
+        <mesh ref={ref} scale={scale ?? 0.25} rotation-x={Math.PI / 2} geometry={nodes[geometryKey].geometry} {...props}>
           <MeshTransmissionMaterial
             buffer={buffer.texture}
             ior={ior ?? 1.15}
-            thickness={thickness ?? 3}
+            thickness={thickness ?? 5}
             anisotropy={anisotropy ?? 0.01}
-            chromaticAberration={chromaticAberration ?? 0.08}
-            transmission={1}
-            roughness={0}
-            transparent
+            chromaticAberration={chromaticAberration ?? 0.1}
             {...extraMat}
           />
         </mesh>
