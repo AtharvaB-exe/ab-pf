@@ -5,14 +5,19 @@ import ProfileCard from "./components/ProfileCard";
 
 export default function App() {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [rawCursor, setRawCursor] = useState({ x: 0, y: 0 });
   const [isEntered, setIsEntered] = useState(false);
   const htmlContentRef = useRef(null);
 
   useEffect(() => {
     const handleGlobalMouseMove = (e) => {
+      // 1. Normalized values for Three.js engine processing
       const x = (e.clientX / window.innerWidth) * 2 - 1;
       const y = -(e.clientY / window.innerHeight) * 2 + 1;
       setMousePos({ x, y });
+      
+      // 2. Absolute coordinate spacing values for tracking indicator node styling
+      setRawCursor({ x: e.clientX, y: e.clientY });
     };
 
     window.addEventListener("mousemove", handleGlobalMouseMove);
@@ -20,18 +25,28 @@ export default function App() {
   }, []);
 
   return (
-    <div className="relative w-full h-screen bg-[#050505] overflow-hidden select-none font-sans">
+    <div className="relative w-full h-screen bg-[#050505] overflow-hidden font-sans cursor-none">
       
-      {/* 1. Underlying Base Background Layer */}
+      {/* Dynamic Pinpoint Accuracy Target Dot Cursor */}
+      <div 
+        className="fixed w-2 h-2 bg-cyan-400 rounded-full pointer-events-none z-50 shadow-[0_0_10px_#22d3ee] -translate-x-1/2 -translate-y-1/2 transition-all duration-75 ease-out"
+        style={{ left: `${rawCursor.x}px`, top: `${rawCursor.y}px` }}
+      />
+      <div 
+        className="fixed w-8 h-8 border border-white/20 rounded-full pointer-events-none z-50 -translate-x-1/2 -translate-y-1/2 transition-all duration-150 ease-out"
+        style={{ left: `${rawCursor.x}px`, top: `${rawCursor.y}px` }}
+      />
+
+      {/* Underlying Base Background Environment Layer */}
       <div
         className="absolute inset-0 bg-cover bg-center pointer-events-none z-0 opacity-40 mix-blend-screen"
         style={{ backgroundImage: "url('/bg.png')" }}
       />
 
-      {/* 2. Ambient Lighting Vignette */}
+      {/* Ambient Lighting Vignette */}
       <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/20 via-transparent to-black/50 pointer-events-none" />
 
-      {/* 3. 3D WebGL Fluid Lens Canvas Layer (Moved underneath the interactive content) */}
+      {/* 3D WebGL Fluid Lens Canvas layer positioned behind interactive modules */}
       {!isEntered && (
         <div className="absolute inset-0 z-20 w-full h-full pointer-events-none">
           <FluidGlass 
@@ -49,14 +64,14 @@ export default function App() {
         </div>
       )}
 
-      {/* 4. HTML Layer (Brought to z-30 so it captures clicks perfectly) */}
+      {/* HTML Core Page Elements Structure Layout */}
       <main ref={htmlContentRef} className="absolute inset-0 z-30 min-h-screen flex items-center justify-center transition-all duration-700">
         
         {!isEntered ? (
           /* ================= GATEWAY GATE ENTRY STAGE ================= */
           <div className="max-w-7xl mx-auto px-8 md:px-16 w-full py-20 text-white flex flex-col items-center justify-center animate-fade-in">
             
-            {/* Mirror spacers mapping matching bounds exactly - explicitly ignoring pointers */}
+            {/* Mirror spacers mapping matching bounds exactly */}
             <div className="opacity-0 pointer-events-none text-center select-none">
               <p className="text-cyan-400 uppercase tracking-[0.5em] text-xs font-bold mb-6">
                 UI/UX DESIGNER • FRONTEND DEVELOPER
@@ -68,23 +83,23 @@ export default function App() {
               </p>
             </div>
 
-            {/* Glowing Custom Enter Trigger Box - Forces pointer events on to override parent blocking */}
+            {/* Glowing Custom Enter Button Container */}
             <div className="mt-14 pointer-events-auto relative z-50">
               <BorderGlow
                 edgeSensitivity={40}
                 glowColor="190 90% 60%"
-                backgroundColor="#09090b"
+                backgroundColor="#0a0a0c"
                 borderRadius={9999}
                 glowRadius={25}
                 glowIntensity={1.2}
                 coneSpread={30}
                 animated={true}
                 colors={['#22d3ee', '#38bdf8', '#c084fc']}
-                className="hover:scale-105 transition-transform duration-300"
+                className="hover:scale-105 transition-transform duration-300 cursor-none"
               >
                 <button 
                   onClick={() => setIsEntered(true)}
-                  className="px-10 py-4 bg-transparent text-sm font-semibold tracking-wider text-white cursor-pointer select-none border border-transparent rounded-full focus:outline-none"
+                  className="px-10 py-4 bg-transparent text-sm font-semibold tracking-wider text-white select-none border border-transparent rounded-full focus:outline-none cursor-none"
                   style={{ minWidth: '150px', minHeight: '48px' }}
                 >
                   Enter
@@ -101,13 +116,13 @@ export default function App() {
               handle="atharvabulbule"
               status="Available for Projects"
               contactText="Get In Touch"
-              avatarUrl="/bg.png" 
-              miniAvatarUrl="/bg.png"
+              avatarUrl="/avatar.jpg" /* Automatically loads your profile photo here */
+              miniAvatarUrl="/avatar.jpg"
               enableTilt={true}
               behindGlowEnabled={true}
               behindGlowColor="rgba(34, 211, 238, 0.4)"
-              innerGradient="linear-gradient(145deg, rgba(15, 23, 42, 0.8) 0%, rgba(88, 28, 135, 0.2) 100%)"
-              onContactClick={() => window.location.href = "mailto:your-email@example.com"}
+              innerGradient="linear-gradient(145deg, rgba(15, 23, 42, 0.9) 0%, rgba(88, 28, 135, 0.2) 100%)"
+              onContactClick={() => window.location.href = "mailto:atharvabulbule@example.com"}
             />
           </div>
         )}

@@ -64,13 +64,13 @@ const ModeWrapper = memo(function ModeWrapper({
       
       ctx.textAlign = 'center';
 
-      // 1. Tagline
+      // 1. Render Subheader Tagline
       ctx.font = '700 13px Inter, sans-serif';
       ctx.fillStyle = '#22d3ee';
       ctx.textBaseline = 'top';
       ctx.fillText('UI/UX DESIGNER • FRONTEND DEVELOPER', paddingLeft, paddingTop);
 
-      // 2. Headline
+      // 2. Render Main Big Typography Headline Stack
       const fontSizePX = window.innerWidth * 0.11; 
       ctx.font = `900 ${fontSizePX}px Inter, sans-serif`;
       ctx.fillStyle = 'rgba(255, 255, 255, 0.98)';
@@ -82,7 +82,7 @@ const ModeWrapper = memo(function ModeWrapper({
       ctx.fillText('ATHARVA', paddingLeft, titleRow1Y);
       ctx.fillText('BULBULE', paddingLeft, titleRow2Y);
 
-      // 3. Paragraph
+      // 3. Render Bottom Paragraph Box
       const paragraphFontSize = isDesktop ? 20 : 16;
       ctx.font = `500 ${paragraphFontSize}px Inter, sans-serif`;
       ctx.fillStyle = '#d4d4d8';
@@ -105,50 +105,7 @@ const ModeWrapper = memo(function ModeWrapper({
         }
       }
       ctx.fillText(structuredLine, paddingLeft, currentParagraphY);
-
-      // 4. Integrated Border Glow Button Render Pass
-      const buttonY = currentParagraphY + paragraphFontSize * 2 + 10;
-      const btnWidth = 150;
-      const btnHeight = 48;
-      const radius = 24;
-      const btnX = paddingLeft - btnWidth / 2;
-
-      // Track cursor proximity to the button center point
-      const mouseXReal = ((mousePos.x + 1) / 2) * window.innerWidth;
-      const mouseYReal = ((-mousePos.y + 1) / 2) * window.innerHeight;
-      const btnCenterX = btnX + btnWidth / 2;
-      const btnCenterY = buttonY + btnHeight / 2;
-      const dist = Math.hypot(mouseXReal - btnCenterX, mouseYReal - btnCenterY);
-
-      // Render the card background layer
-      ctx.save();
-      ctx.beginPath();
-      ctx.roundRect(btnX, buttonY, btnWidth, btnHeight, radius);
-      ctx.fillStyle = '#09090b';
-      ctx.fill();
       
-      // Compute responsive reactive border light color distribution strings
-      if (dist < 180) {
-        const borderGlowGrad = ctx.createRadialGradient(mouseXReal, mouseYReal, 10, btnCenterX, btnCenterY, 80);
-        borderGlowGrad.addColorStop(0, '#22d3ee');
-        borderGlowGrad.addColorStop(0.5, '#38bdf8');
-        borderGlowGrad.addColorStop(1, 'transparent');
-        
-        ctx.strokeStyle = borderGlowGrad;
-        ctx.lineWidth = 2;
-      } else {
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
-        ctx.lineWidth = 1;
-      }
-      ctx.stroke();
-      ctx.restore();
-
-      // Draw active interior text metrics
-      ctx.font = '600 14px Inter, sans-serif';
-      ctx.fillStyle = '#ffffff';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText('Enter', paddingLeft, buttonY + btnHeight / 2);
       ctx.textAlign = 'left';
 
       const texture = new THREE.CanvasTexture(canvas);
@@ -159,7 +116,7 @@ const ModeWrapper = memo(function ModeWrapper({
     updateTextureFromHTML();
     window.addEventListener('resize', updateTextureFromHTML);
     return () => window.removeEventListener('resize', updateTextureFromHTML);
-  }, [htmlRef, mousePos]);
+  }, [htmlRef]);
 
   useFrame((state, delta) => {
     const { gl, camera } = state;
