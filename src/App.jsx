@@ -10,6 +10,9 @@ export default function App() {
   const htmlContentRef = useRef(null);
 
   useEffect(() => {
+    // CONDITIONAL STOP: If the user is already on the card page, completely kill this mouse tracking loop
+    if (isEntered) return;
+
     const handleGlobalMouseMove = (e) => {
       const x = (e.clientX / window.innerWidth) * 2 - 1;
       const y = -(e.clientY / window.innerHeight) * 2 + 1;
@@ -19,7 +22,19 @@ export default function App() {
 
     window.addEventListener("mousemove", handleGlobalMouseMove);
     return () => window.removeEventListener("mousemove", handleGlobalMouseMove);
-  }, []);
+  }, [isEntered]); // Re-runs and cleans up when page state switches
+
+  // Lightweight independent listener JUST for the custom pointer dot on the second page
+  useEffect(() => {
+    if (!isEntered) return;
+
+    const handleCardMouseMove = (e) => {
+      setRawCursor({ x: e.clientX, y: e.clientY });
+    };
+
+    window.addEventListener("mousemove", handleCardMouseMove);
+    return () => window.removeEventListener("mousemove", handleCardMouseMove);
+  }, [isEntered]);
 
   return (
     <div className="relative w-full h-screen bg-[#050505] overflow-hidden font-sans cursor-none">
@@ -34,7 +49,7 @@ export default function App() {
         style={{ left: `${rawCursor.x}px`, top: `${rawCursor.y}px` }}
       />
 
-      {/* Underlying Base Background Environment Layer */}
+      {/* Underlying Base Background Layer */}
       <div
         className="absolute inset-0 bg-cover bg-center pointer-events-none z-0 opacity-40 mix-blend-screen"
         style={{ backgroundImage: "url('/bg.png')" }}
@@ -68,7 +83,6 @@ export default function App() {
           /* ================= GATEWAY GATE ENTRY STAGE ================= */
           <div className="max-w-7xl mx-auto px-8 md:px-16 w-full py-20 text-white flex flex-col items-center justify-center animate-fade-in">
             
-            {/* Mirror spacers mapping matching bounds exactly */}
             <div className="opacity-0 pointer-events-none text-center select-none">
               <p className="text-cyan-400 uppercase tracking-[0.5em] text-xs font-bold mb-6">
                 UI/UX DESIGNER • FRONTEND DEVELOPER
@@ -80,7 +94,6 @@ export default function App() {
               </p>
             </div>
 
-            {/* Glowing Custom Enter Button Container */}
             <div className="mt-14 pointer-events-auto relative z-50">
               <BorderGlow
                 edgeSensitivity={40}
@@ -113,8 +126,8 @@ export default function App() {
               handle="atharvabulbule"
               status="Available for Projects"
               contactText="Get In Touch"
-              avatarUrl="/avatar.png" /* Changed path to .png */
-              miniAvatarUrl="/avatar.png" /* Changed path to .png */
+              avatarUrl="/avatar.png" 
+              miniAvatarUrl="/avatar.png" 
               enableTilt={true}
               behindGlowEnabled={true}
               behindGlowColor="rgba(34, 211, 238, 0.4)"
@@ -126,7 +139,6 @@ export default function App() {
 
       </main>
 
-      {/* Basic Keyframe Transitions Styles */}
       <style>{`
         @keyframes fadeIn {
           from { opacity: 0; }
