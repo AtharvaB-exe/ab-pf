@@ -7,7 +7,8 @@ import {
   useGLTF,
   Preload,
   MeshTransmissionMaterial,
-  Image
+  Image,
+  Text
 } from '@react-three/drei';
 import { easing } from 'maath';
 
@@ -18,7 +19,7 @@ export default function FluidGlass({ mode = 'lens', lensProps = {} }) {
   return (
     <Canvas camera={{ position: [0, 0, 20], fov: 15 }} gl={{ alpha: true }}>
       <Wrapper modeProps={rawOverrides}>
-        <SceneBackground />
+        <SceneContent />
         <Preload />
       </Wrapper>
     </Canvas>
@@ -57,12 +58,12 @@ const ModeWrapper = memo(function ModeWrapper({
     const destY = lockToBottom ? -v.height / 2 + 0.2 : followPointer ? (pointer.y * v.height) / 2 : 0;
     
     if (ref.current) {
-      easing.damp3(ref.current.position, [destX, destY, 15], 0.15, delta);
+      easing.damp3(ref.current.position, [destX, destY, 15], 0.12, delta);
 
       if (modeProps.scale == null) {
         const maxWorld = v.width * 0.9;
         const desired = maxWorld / geoWidthRef.current;
-        ref.current.scale.setScalar(Math.min(0.25, desired));
+        ref.current.scale.setScalar(Math.min(0.24, desired));
       }
     }
 
@@ -81,13 +82,13 @@ const ModeWrapper = memo(function ModeWrapper({
         <meshBasicMaterial map={buffer.texture} transparent />
       </mesh>
       {nodes[geometryKey] && (
-        <mesh ref={ref} scale={scale ?? 0.25} rotation-x={Math.PI / 2} geometry={nodes[geometryKey].geometry} {...props}>
+        <mesh ref={ref} scale={scale ?? 0.24} rotation-x={Math.PI / 2} geometry={nodes[geometryKey].geometry} {...props}>
           <MeshTransmissionMaterial
             buffer={buffer.texture}
-            ior={ior ?? 1.15}
-            thickness={thickness ?? 5}
-            anisotropy={anisotropy ?? 0.01}
-            chromaticAberration={chromaticAberration ?? 0.1}
+            ior={ior ?? 1.22}
+            thickness={thickness ?? 5.5}
+            anisotropy={anisotropy ?? 0.03}
+            chromaticAberration={chromaticAberration ?? 0.14}
             transmission={1}
             roughness={0.0}
             {...extraMat}
@@ -111,7 +112,72 @@ function Bar({ modeProps = {}, ...p }) {
   return <ModeWrapper glb="/assets/3d/bar.glb" geometryKey="Cube" lockToBottom followPointer={false} modeProps={{ ...defaultMat, ...modeProps }} {...p} />;
 }
 
-function SceneBackground() {
+// 3D Visual Tree containing background + text structures inside the render target buffer
+function SceneContent() {
   const { width, height } = useThree((state) => state.viewport);
-  return <Image position={[0, 0, 0]} scale={[width, height, 1]} url="/bg.png" />;
+
+  // Dynamic responsive sizing calculation weights based on screen size properties
+  const isMobile = window.innerWidth < 768;
+  const headlineSize = isMobile ? height * 0.11 : height * 0.14;
+  const startX = isMobile ? -width * 0.42 : -width * 0.38;
+
+  return (
+    <group>
+      {/* 3D Core Layer Background Texture */}
+      <Image position={[0, 0, 0]} scale={[width, height, 1]} url="/bg.png" />
+
+      {/* Sub-Headline Text Element */}
+      <Text
+        position={[startX, height * 0.22, 2]}
+        fontSize={height * 0.02}
+        font="https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuGdfAZ9hiA.woff2"
+        color="#22d3ee"
+        anchorX="left"
+        anchorY="middle"
+        letterSpacing={0.4}
+      >
+        UI/UX DESIGNER • FRONTEND DEVELOPER
+      </Text>
+
+      {/* Main Headline Stack: Row 1 */}
+      <Text
+        position={[startX, height * 0.08, 2]}
+        fontSize={headlineSize}
+        font="https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuGdfAZ9hiA.woff2"
+        color="white"
+        anchorX="left"
+        anchorY="middle"
+        letterSpacing={-0.04}
+      >
+        ATHARVA
+      </Text>
+
+      {/* Main Headline Stack: Row 2 */}
+      <Text
+        position={[startX, -height * 0.06, 2]}
+        fontSize={headlineSize}
+        font="https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuGdfAZ9hiA.woff2"
+        color="white"
+        anchorX="left"
+        anchorY="middle"
+        letterSpacing={-0.04}
+      >
+        BULBULE
+      </Text>
+
+      {/* Paragraph Core Summary Text Section */}
+      <Text
+        position={[startX, -height * 0.18, 2]}
+        fontSize={height * 0.026}
+        font="https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2"
+        color="#d4d4d8"
+        anchorX="left"
+        anchorY="top"
+        maxWidth={isMobile ? width * 0.85 : width * 0.45}
+        lineHeight={1.4}
+      >
+        Crafting cinematic digital experiences through design, code, and visual storytelling.
+      </Text>
+    </group>
+  );
 }
