@@ -2,7 +2,11 @@
 import * as THREE from 'three';
 import { useRef, useState, useEffect, memo } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { useGLTF, Preload, MeshTransmissionMaterial } from '@react-three/drei';
+import {
+  useGLTF,
+  Preload,
+  MeshTransmissionMaterial
+} from '@react-three/drei';
 import { easing } from 'maath';
 
 export default function FluidGlass({ mode = 'lens', lensProps = {}, barProps = {}, cubeProps = {} }) {
@@ -27,6 +31,7 @@ const ModeWrapper = memo(function ModeWrapper({
 }) {
   const ref = useRef();
   const { nodes } = useGLTF(glb);
+  const { viewport: vp } = useThree();
   const geoWidthRef = useRef(1);
 
   useEffect(() => {
@@ -53,6 +58,7 @@ const ModeWrapper = memo(function ModeWrapper({
       }
     }
 
+    // FIXED: Prevent the canvas from painting a solid color fill mask over layers beneath it
     gl.setClearColor(0x000000, 0);
   });
 
@@ -69,6 +75,8 @@ const ModeWrapper = memo(function ModeWrapper({
             chromaticAberration={chromaticAberration ?? 0.2}
             transmission={1.0}
             roughness={0.0}
+            distortion={0.3}
+            distortionScale={0.5}
             transparent
             {...extraMat}
           />
@@ -80,4 +88,7 @@ const ModeWrapper = memo(function ModeWrapper({
 
 function Lens({ modeProps, ...p }) { return <ModeWrapper glb="/assets/3d/lens.glb" geometryKey="Cylinder" followPointer modeProps={modeProps} {...p} />; }
 function Cube({ modeProps, ...p }) { return <ModeWrapper glb="/assets/3d/cube.glb" geometryKey="Cube" followPointer modeProps={modeProps} {...p} />; }
-function Bar({ modeProps = {}, ...p }) { return <ModeWrapper glb="/assets/3d/bar.glb" geometryKey="Cube" lockToBottom followPointer={false} modeProps={modeProps} {...p} />; }
+function Bar({ modeProps = {}, ...p }) {
+  const defaultMat = { transmission: 1, roughness: 0, thickness: 10, ior: 1.15, color: '#ffffff' };
+  return <ModeWrapper glb="/assets/3d/bar.glb" geometryKey="Cube" lockToBottom followPointer={false} modeProps={{ ...defaultMat, ...modeProps }} {...p} />;
+}
