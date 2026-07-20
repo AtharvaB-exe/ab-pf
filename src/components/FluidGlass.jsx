@@ -1,40 +1,23 @@
 /* eslint-disable react/no-unknown-property */
 import * as THREE from 'three';
 import { useRef, useState, useEffect, memo } from 'react';
-import { Canvas, createPortal, useFrame, useThree } from '@react-three/fiber';
-import {
-  useFBO,
-  useGLTF,
-  Preload,
-  MeshTransmissionMaterial
-} from '@react-three/drei';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { useFBO, useGLTF, Preload, MeshTransmissionMaterial } from '@react-three/drei';
 import { easing } from 'maath';
 
-export default function FluidGlass({ mode = 'lens', lensProps = {}, barProps = {}, cubeProps = {}, children }) {
+export default function FluidGlass({ mode = 'lens', lensProps = {} }) {
   const Wrapper = mode === 'bar' ? Bar : mode === 'cube' ? Cube : Lens;
   const rawOverrides = mode === 'bar' ? barProps : mode === 'cube' ? cubeProps : lensProps;
 
-  const {
-    navItems = [
-      { label: 'Home', link: '' },
-      { label: 'About', link: '' },
-      { label: 'Contact', link: '' }
-    ],
-    ...modeProps
-  } = rawOverrides;
-
   return (
     <Canvas camera={{ position: [0, 0, 20], fov: 15 }} gl={{ alpha: true }}>
-      <Wrapper modeProps={modeProps}>
-        {children}
-        <Preload />
-      </Wrapper>
+      <Wrapper modeProps={rawOverrides} />
+      <Preload />
     </Canvas>
   );
 }
 
 const ModeWrapper = memo(function ModeWrapper({
-  children,
   glb,
   geometryKey,
   lockToBottom = false,
@@ -73,23 +56,19 @@ const ModeWrapper = memo(function ModeWrapper({
       }
     }
 
-    // Capture everything inside the portal layout pass into the distortion buffer
     gl.setRenderTarget(buffer);
     gl.render(scene, camera);
     gl.setRenderTarget(null);
-
-    // FIXED: Keep the clear alpha clean so it drops the solid fill void mask color
-    gl.setClearColor(0x000000, 0);
+    gl.setClearColor(0x000000, 0); // Keep alpha channel completely transparent
   });
 
   const { scale, ior, thickness, anisotropy, chromaticAberration, ...extraMat } = modeProps;
 
   return (
     <>
-      {createPortal(children, scene)}
       <mesh scale={[vp.width, vp.height, 1]}>
         <planeGeometry />
-        <meshBasicMaterial map={buffer.texture} transparent opacity={1} />
+        <meshBasicMaterial map={buffer.texture} transparent opacity={0} />
       </mesh>
       {nodes[geometryKey] && (
         <mesh ref={ref} scale={scale ?? 0.15} rotation-x={Math.PI / 2} geometry={nodes[geometryKey]?.geometry} {...props}>
@@ -100,9 +79,7 @@ const ModeWrapper = memo(function ModeWrapper({
             anisotropy={anisotropy ?? 0.01}
             chromaticAberration={chromaticAberration ?? 0.1}
             transmission={1}
-            roughness={0.0}
-            thickness={3.5}
-            chromaticAberration={0.15}
+            roughness={0}
             transparent
             {...extraMat}
           />
@@ -112,25 +89,9 @@ const ModeWrapper = memo(function ModeWrapper({
   );
 });
 
-function Lens({ modeProps, ...p }) {
-  return <ModeWrapper glb="/assets/3d/lens.glb" geometryKey="Cylinder" followPointer modeProps={modeProps} {...p} />;
-}
-
-function Cube({ modeProps, ...p }) {
-  return <ModeWrapper glb="/assets/3d/cube.glb" geometryKey="Cube" followPointer modeProps={modeProps} {...p} />;
-}
-
+function Lens({ modeProps, ...p }) { return <ModeWrapper glb="/assets/3d/lens.glb" geometryKey="Cylinder" followPointer modeProps={modeProps} {...p} />; }
+function Cube({ modeProps, ...p }) { return <ModeWrapper glb="/assets/3d/cube.glb" geometryKey="Cube" followPointer modeProps={modeProps} {...p} />; }
 function Bar({ modeProps = {}, ...p }) {
-  const defaultMat = {
-    transmission: 1,
-    roughness: 0,
-    thickness: 10,
-    ior: 1.15,
-    color: '#ffffff',
-    attenuationColor: '#ffffff',
-    attenuationDistance: 0.25
-  };
-  return (
-    <ModeWrapper glb="/assets/3d/bar.glb" geometryKey="Cube" lockToBottom followPointer={false} modeProps={{ ...defaultMat, ...modeProps }} {...p} />
-  );
+  const defaultMat = { transmission: 1, roughness: 0, thickness: 10, ior: 1.15, color: '#ffffff' };
+  return <ModeWrapper glb="/assets/3d/bar.glb" geometryKey="Cube" lockToBottom followPointer={false} modeProps={{ ...defaultMat, ...modeProps }} {...p} />;
 }
