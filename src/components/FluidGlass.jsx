@@ -3,19 +3,23 @@ import * as THREE from 'three';
 import { useRef, useState, useEffect, memo } from 'react';
 import { Canvas, createPortal, useFrame, useThree } from '@react-three/fiber';
 import {
+  useFBO,
   useGLTF,
   Preload,
   MeshTransmissionMaterial
 } from '@react-three/drei';
 import { easing } from 'maath';
 
-export default function FluidGlass({ mode = 'lens', lensProps = {}, barProps = {}, cubeProps = {}, children }) {
+export default function FluidGlass({ mode = 'lens', lensProps = {}, barProps = {}, cubeProps = {} }) {
   const Wrapper = mode === 'bar' ? Bar : mode === 'cube' ? Cube : Lens;
   const rawOverrides = mode === 'bar' ? barProps : mode === 'cube' ? cubeProps : lensProps;
 
+  // Pull children content explicitly inside the global canvas scope wrapper
+  const { children, ...modeProps } = rawOverrides;
+
   return (
     <Canvas camera={{ position: [0, 0, 20], fov: 15 }} gl={{ alpha: true }}>
-      <Wrapper modeProps={rawOverrides}>
+      <Wrapper modeProps={modeProps}>
         {children}
         <Preload />
       </Wrapper>
@@ -34,6 +38,7 @@ const ModeWrapper = memo(function ModeWrapper({
 }) {
   const ref = useRef();
   const { nodes } = useGLTF(glb);
+  const buffer = useFBO();
   const { viewport: vp } = useThree();
   const [scene] = useState(() => new THREE.Scene());
   const geoWidthRef = useRef(1);
@@ -62,7 +67,11 @@ const ModeWrapper = memo(function ModeWrapper({
       }
     }
 
-    // FIXED: Keeps the rendering context fully transparent so layers below shine through
+    gl.setRenderTarget(buffer);
+    gl.render(scene, camera);
+    gl.setRenderTarget(null);
+
+    // FIXED: Clear internal rendering void mask with 0 alpha to allow background layers to view perfectly
     gl.setClearColor(0x000000, 0);
   });
 
@@ -71,15 +80,20 @@ const ModeWrapper = memo(function ModeWrapper({
   return (
     <>
       {createPortal(children, scene)}
+      <mesh scale={[vp.width, vp.height, 1]}>
+        <planeGeometry />
+        <meshBasicMaterial map={buffer.texture} transparent opacity={1} />
+      </mesh>
       {nodes[geometryKey] && (
         <mesh ref={ref} scale={scale ?? 0.15} rotation-x={Math.PI / 2} geometry={nodes[geometryKey]?.geometry} {...props}>
           <MeshTransmissionMaterial
+            buffer={buffer.texture}
             ior={ior ?? 1.15}
             thickness={thickness ?? 5}
             anisotropy={anisotropy ?? 0.01}
             chromaticAberration={chromaticAberration ?? 0.1}
             transmission={1.0}
-            roughness={0.05}
+            roughness={0.0}
             transparent
             {...extraMat}
           />
@@ -89,23 +103,9 @@ const ModeWrapper = memo(function ModeWrapper({
   );
 });
 
-function Lens({ modeProps, ...p }) {
-  return <ModeWrapper glb="/assets/3d/lens.glb" geometryKey="Cylinder" followPointer modeProps={modeProps} {...p} />;
-}
-
-function Cube({ modeProps, ...p }) {
-  return <ModeWrapper glb="/assets/3d/cube.glb" geometryKey="Cube" followPointer modeProps={modeProps} {...p} />;
-}
-
+function Lens({ modeProps, ...p }) { return <ModeWrapper glb="/assets/3d/lens.glb" geometryKey="Cylinder" followPointer modeProps={modeProps} {...p} />; }
+function Cube({ modeProps, ...p }) { return <ModeWrapper glb="/assets/3d/cube.glb" geometryKey="Cube" followPointer modeProps={modeProps} {...p} />; }
 function Bar({ modeProps = {}, ...p }) {
-  const defaultMat = {
-    transmission: 1,
-    roughness: 0,
-    thickness: 10,
-    ior: 1.15,
-    color: '#ffffff'
-  };
-  return (
-    <ModeWrapper glb="/assets/3d/bar.glb" geometryKey="Cube" lockToBottom followPointer={false} modeProps={{ ...defaultMat, ...modeProps }} {...p} />
-  );
+  const defaultMat = { transmission: 1, roughness: 0, thickness: 10, ior: 1.15, color: '#ffffff' };
+  return <ModeWrapper glb="/assets/3d/bar.glb" geometryKey="Cube" lockToBottom followPointer={false} modeProps={{ ...defaultMat, ...modeProps }} {...p} />;
 }
