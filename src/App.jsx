@@ -1,16 +1,11 @@
-import { useState, useEffect, useRef } from "react";
-import FluidGlass from "./components/FluidGlass";
+import { useState, useEffect } from "react";
+import Prism from "./components/Prism";
 
 export default function App() {
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [rawCursor, setRawCursor] = useState({ x: 0, y: 0 });
-  const htmlContentRef = useRef(null);
 
   useEffect(() => {
     const handleGlobalMouseMove = (e) => {
-      const x = (e.clientX / window.innerWidth) * 2 - 1;
-      const y = -(e.clientY / window.innerHeight) * 2 + 1;
-      setMousePos({ x, y });
       setRawCursor({ x: e.clientX, y: e.clientY });
     };
 
@@ -31,33 +26,26 @@ export default function App() {
         style={{ left: `${rawCursor.x}px`, top: `${rawCursor.y}px` }}
       />
 
-      {/* Underlying Base Background Layer */}
-      <div
-        className="absolute inset-0 bg-cover bg-center pointer-events-none z-0 opacity-40 mix-blend-screen animate-fade-in"
-        style={{ backgroundImage: "url('/bg.png')" }}
-      />
+      {/* New WebGL Generative Prism Shader Canvas Background */}
+      <div className="absolute inset-0 z-0 w-full h-full position-relative">
+        <Prism
+          animationType="rotate"
+          timeScale={0.5}
+          height={3.5}
+          baseWidth={5.5}
+          scale={3.6}
+          hueShift={0}
+          colorFrequency={1}
+          noise={0.5}
+          glow={1}
+        />
+      </div>
 
       {/* Ambient Lighting Vignette */}
       <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/20 via-transparent to-black/50 pointer-events-none" />
 
-      {/* 3D WebGL Fluid Lens Canvas layer */}
-      <div className="absolute inset-0 z-20 w-full h-full pointer-events-none">
-        <FluidGlass 
-          mode="lens" 
-          mousePos={mousePos}
-          htmlRef={htmlContentRef}
-          lensProps={{
-            scale: 0.24,
-            ior: 1.25,
-            thickness: 5.5,
-            chromaticAberration: 0.14,
-            anisotropy: 0.03  
-          }}
-        />
-      </div>
-
       {/* Permanent Centered Layout Canvas Frame */}
-      <main ref={htmlContentRef} className="absolute inset-0 z-30 min-h-screen flex items-center justify-center">
+      <main className="absolute inset-0 z-30 min-h-screen flex items-center justify-center">
         <div className="w-full flex flex-col items-center justify-center text-center text-white px-4 md:px-16 animate-fade-in">
           
           <div className="flex flex-col items-center justify-center text-center">
