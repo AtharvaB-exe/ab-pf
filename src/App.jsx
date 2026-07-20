@@ -1,5 +1,21 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, Component } from "react";
 import Prism from "./components/Prism";
+
+// Safe Error Boundary to catch any WebGL/OGL crashes silently
+class WebGLErrorBoundary extends Component {
+  state = { hasError: false };
+  static getDerivedStateFromError() { return { hasError: true }; }
+  componentDidCatch(error, errorInfo) {
+    console.error("WebGL Background crashed:", error, errorInfo);
+  }
+  render() {
+    if (this.state.hasError) {
+      // Fallback clean dark gradient if WebGL fails
+      return <div className="absolute inset-0 bg-gradient-to-tr from-[#0a0518] via-[#050505] to-[#0c1020] opacity-90" />;
+    }
+    return this.props.children;
+  }
+}
 
 export default function App() {
   const [rawCursor, setRawCursor] = useState({ x: 0, y: 0 });
@@ -26,27 +42,29 @@ export default function App() {
         style={{ left: `${rawCursor.x}px`, top: `${rawCursor.y}px` }}
       />
 
-      {/* Fixed Prism Background Canvas Container */}
-      <div className="absolute inset-0 z-0 w-full h-full relative">
-        <Prism
-          animationType="rotate"
-          timeScale={0.5}
-          height={3.5}
-          baseWidth={5.5}
-          scale={3.6}
-          hueShift={0}
-          colorFrequency={1}
-          noise={0.5}
-          glow={1}
-        />
+      {/* Error-Isolated Prism Background Layer */}
+      <div className="absolute inset-0 z-0 w-full h-full">
+        <WebGLErrorBoundary>
+          <Prism
+            animationType="rotate"
+            timeScale={0.5}
+            height={3.5}
+            baseWidth={5.5}
+            scale={3.6}
+            hueShift={0}
+            colorFrequency={1}
+            noise={0.5}
+            glow={1}
+          />
+        </WebGLErrorBoundary>
       </div>
 
       {/* Ambient Lighting Vignette Overlay */}
       <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/20 via-transparent to-black/50 pointer-events-none" />
 
-      {/* Correct Center Grid Main Frame Layout Sheet */}
-      <main className="absolute inset-0 z-30 min-h-screen flex flex-col items-center justify-center">
-        <div className="w-full flex flex-col items-center justify-center text-center text-white px-4 md:px-16 animate-fade-in">
+      {/* Fixed Center Grid Main Frame Layout Sheet */}
+      <main className="absolute inset-0 z-30 min-h-screen flex flex-col items-center justify-center pointer-events-none">
+        <div className="w-full flex flex-col items-center justify-center text-center text-white px-4 md:px-16 animate-fade-in pointer-events-auto">
           
           <p className="text-cyan-400 uppercase tracking-[0.5em] text-xs md:text-sm font-bold mb-6">
             UI/UX DESIGNER • FRONTEND DEVELOPER
