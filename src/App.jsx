@@ -75,16 +75,17 @@ export default function App() {
         />
       </div>
 
-      {/* 2. Fluid Glass Refraction Canvas System Overlay */}
-      <div style={{ position: 'absolute', inset: 0, zIndex: 10, width: '100%', height: '100%' }}>
+      {/* 2. Pure React Bits Fluid Glass Integration Layer */}
+      {/* Note: The open-source code applies its own neon background behind its internal models */}
+      <div style={{ position: 'absolute', inset: 0, zIndex: 10, width: '100%', height: '100%', mixBlendMode: 'screen', opacity: 0.85 }}>
         <FluidGlass 
           mode="lens"
           lensProps={{
-            scale: 0.24,
-            ior: 1.35,
-            thickness: 8,
-            chromaticAberration: 0.25,
-            anisotropy: 0.05
+            scale: 0.25,
+            ior: 1.15,
+            thickness: 5,
+            chromaticAberration: 0.1,
+            anisotropy: 0.01  
           }}
         />
       </div>
@@ -93,10 +94,83 @@ export default function App() {
       <div style={{
         position: 'absolute',
         inset: 0,
-        zIndex: 20,
-        background: 'linear-gradient(to bottom, rgba(0,0,0,0.1), transparent, rgba(0,0,0,0.4))',
+        zIndex: 15,
+        background: 'linear-gradient(to bottom, rgba(0,0,0,0.15), transparent, rgba(0,0,0,0.45))',
         pointerEvents: 'none'
       }} />
+
+      {/* 3. Centered HTML Portfolio Typography Layer */}
+      <main style={{
+        position: 'absolute',
+        inset: 0,
+        zIndex: 20,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '100vh',
+        width: '100%',
+        boxSizing: 'border-box',
+        pointerEvents: 'none'
+      }}>
+        <div style={{
+          width: '100%',
+          textAlign: 'center',
+          color: '#ffffff',
+          padding: '0 16px',
+          boxSizing: 'border-box',
+          animation: 'fadeIn 0.8s ease-out forwards'
+        }}>
+          
+          <p style={{
+            color: '#22d3ee',
+            textTransform: 'uppercase',
+            letterSpacing: '0.5em',
+            fontSize: '14px',
+            fontWeight: 'bold',
+            marginBottom: '24px'
+          }}>
+            UI/UX DESIGNER • FRONTEND DEVELOPER
+          </p>
+          <h1 style={{
+            fontSize: '11vw',
+            fontWeight: 900,
+            lineHeight: 0.85,
+            letterSpacing: '-0.03em',
+            textTransform: 'uppercase',
+            color: '#ffffff',
+            margin: '0'
+          }}>
+            ATHARVA
+          </h1>
+          <h1 style={{
+            fontSize: '11vw',
+            fontWeight: 900,
+            lineHeight: 0.85,
+            letterSpacing: '-0.03em',
+            textTransform: 'uppercase',
+            color: '#ffffff',
+            margin: '0 0 32px 0'
+          }}>
+            BULBULE
+          </h1>
+          <p style={{
+            maxWidth: '560px',
+            color: '#d4d4d8',
+            fontSize: '20px',
+            fontWeight: 500,
+            lineHeight: 1.6,
+            margin: '0 auto'
+          }}>
+            Crafting cinematic digital experiences through design, code, and visual storytelling.
+          </p>
+
+        </div>
+      </main>
+
+      <style>{`
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+      `}</style>
 
     </div>
   );
