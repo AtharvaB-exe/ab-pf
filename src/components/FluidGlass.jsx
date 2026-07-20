@@ -1,11 +1,13 @@
 /* eslint-disable react/no-unknown-property */
 import * as THREE from 'three';
 import { useRef, useState, useEffect, memo } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { Canvas, createPortal, useFrame, useThree } from '@react-three/fiber';
 import {
+  useFBO,
   useGLTF,
   Preload,
-  MeshTransmissionMaterial
+  MeshTransmissionMaterial,
+  Text
 } from '@react-three/drei';
 import { easing } from 'maath';
 
@@ -15,8 +17,9 @@ export default function FluidGlass({ mode = 'lens', lensProps = {}, barProps = {
 
   return (
     <Canvas camera={{ position: [0, 0, 20], fov: 15 }} gl={{ alpha: true }}>
-      <Wrapper modeProps={rawOverrides} />
-      <Preload />
+      <Wrapper modeProps={rawOverrides}>
+        <Preload />
+      </Wrapper>
     </Canvas>
   );
 }
@@ -31,7 +34,9 @@ const ModeWrapper = memo(function ModeWrapper({
 }) {
   const ref = useRef();
   const { nodes } = useGLTF(glb);
+  const buffer = useFBO();
   const { viewport: vp } = useThree();
+  const [scene] = useState(() => new THREE.Scene());
   const geoWidthRef = useRef(1);
 
   useEffect(() => {
@@ -58,7 +63,11 @@ const ModeWrapper = memo(function ModeWrapper({
       }
     }
 
-    // FIXED: Prevent the canvas from painting a solid color fill mask over layers beneath it
+    gl.setRenderTarget(buffer);
+    gl.render(scene, camera);
+    gl.setRenderTarget(null);
+
+    // Keep background clear so your Prism background stays visible
     gl.setClearColor(0x000000, 0);
   });
 
@@ -66,17 +75,75 @@ const ModeWrapper = memo(function ModeWrapper({
 
   return (
     <>
+      {createPortal(
+        <group>
+          {/* Subtitle */}
+          <Text
+            position={[0, 1.4, 12]}
+            fontSize={0.07}
+            letterSpacing={0.4}
+            color="#22d3ee"
+            anchorX="center"
+            anchorY="middle"
+          >
+            UI/UX DESIGNER • FRONTEND DEVELOPER
+          </Text>
+
+          {/* Main Headline Text to Liquid Warping */}
+          <Text
+            position={[0, 0.4, 12]}
+            fontSize={0.48}
+            fontWeight={900}
+            letterSpacing={-0.03}
+            color="white"
+            anchorX="center"
+            anchorY="middle"
+          >
+            ATHARVA
+          </Text>
+          <Text
+            position={[0, -0.4, 12]}
+            fontSize={0.48}
+            fontWeight={900}
+            letterSpacing={-0.03}
+            color="white"
+            anchorX="center"
+            anchorY="middle"
+          >
+            BULBULE
+          </Text>
+
+          {/* Description Tagline */}
+          <Text
+            position={[0, -1.1, 12]}
+            fontSize={0.09}
+            maxWidth={3.2}
+            textAlign="center"
+            color="#d4d4d8"
+            anchorX="center"
+            anchorY="middle"
+          >
+            Crafting cinematic digital experiences through design, code, and visual storytelling.
+          </Text>
+        </group>,
+        scene
+      )}
+      
+      <mesh scale={[vp.width, vp.height, 1]}>
+        <planeGeometry />
+        <meshBasicMaterial map={buffer.texture} transparent />
+      </mesh>
+      
       {nodes[geometryKey] && (
         <mesh ref={ref} scale={scale ?? 0.24} rotation-x={Math.PI / 2} geometry={nodes[geometryKey]?.geometry} {...props}>
           <MeshTransmissionMaterial
-            ior={ior ?? 1.25}
-            thickness={thickness ?? 6}
-            anisotropy={anisotropy ?? 0.05}
-            chromaticAberration={chromaticAberration ?? 0.2}
+            buffer={buffer.texture}
+            ior={ior ?? 1.35}
+            thickness={thickness ?? 8}
+            anisotropy={anisotropy ?? 0.1}
+            chromaticAberration={chromaticAberration ?? 0.25}
             transmission={1.0}
             roughness={0.0}
-            distortion={0.3}
-            distortionScale={0.5}
             transparent
             {...extraMat}
           />
@@ -88,7 +155,4 @@ const ModeWrapper = memo(function ModeWrapper({
 
 function Lens({ modeProps, ...p }) { return <ModeWrapper glb="/assets/3d/lens.glb" geometryKey="Cylinder" followPointer modeProps={modeProps} {...p} />; }
 function Cube({ modeProps, ...p }) { return <ModeWrapper glb="/assets/3d/cube.glb" geometryKey="Cube" followPointer modeProps={modeProps} {...p} />; }
-function Bar({ modeProps = {}, ...p }) {
-  const defaultMat = { transmission: 1, roughness: 0, thickness: 10, ior: 1.15, color: '#ffffff' };
-  return <ModeWrapper glb="/assets/3d/bar.glb" geometryKey="Cube" lockToBottom followPointer={false} modeProps={{ ...defaultMat, ...modeProps }} {...p} />;
-}
+function Bar({ modeProps = {}, ...p }) { return <ModeWrapper glb="/assets/3d/bar.glb" geometryKey="Cube" lockToBottom followPointer={false} modeProps={modeProps} {...p} />; }
