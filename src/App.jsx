@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Prism from "./components/Prism";
+import FluidGlass from "./components/FluidGlass";
 
 export default function App() {
   const [rawCursor, setRawCursor] = useState({ x: 0, y: 0 });
@@ -59,7 +60,7 @@ export default function App() {
         }}
       />
 
-      {/* WebGL Prism Shader Background */}
+      {/* WebGL Prism Shader Background Layer */}
       <div style={{ position: 'absolute', inset: 0, zIndex: 0, width: '100%', height: '100%' }}>
         <Prism
           animationType="rotate"
@@ -74,6 +75,20 @@ export default function App() {
         />
       </div>
 
+      {/* React Bits Fluid Glass Refraction Pass Layer */}
+      <div style={{ position: 'absolute', inset: 0, zIndex: 10, width: '100%', height: '100%', pointerEvents: 'none' }}>
+        <FluidGlass 
+          mode="lens"
+          lensProps={{
+            scale: 0.25,
+            ior: 1.15,
+            thickness: 5,
+            chromaticAberration: 0.1,
+            anisotropy: 0.01  
+          }}
+        />
+      </div>
+
       {/* Ambient Lighting Vignette Overlay */}
       <div style={{
         position: 'absolute',
@@ -83,7 +98,7 @@ export default function App() {
         pointerEvents: 'none'
       }} />
 
-      {/* Centered Typography Layout Frame */}
+      {/* Centered Typography Content Canvas Frame */}
       <main style={{
         position: 'absolute',
         inset: 0,
