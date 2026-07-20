@@ -34,26 +34,28 @@ export default function App() {
           backgroundColor: '#22d3ee',
           borderRadius: '50%',
           pointerEvents: 'none',
-          zIndex: 50,
+          zIndex: 9999,
           boxShadow: '0 0 10px #22d3ee',
-          transform: 'translate(-50%, -50%)',
-          left: `${rawCursor.x}px`,
-          top: `${rawCursor.y}px`
+          top: 0,
+          left: 0,
+          transform: `translate3d(${rawCursor.x - 4}px, ${rawCursor.y - 4}px, 0)`
         }}
       />
+      
+      {/* Restored Outer Tracing Circle */}
       <div 
         style={{
           position: 'fixed',
           width: '32px',
           height: '32px',
-          border: '1px solid rgba(255, 255, 255, 0.2)',
+          border: '1px solid rgba(34, 211, 238, 0.5)',
           borderRadius: '50%',
           pointerEvents: 'none',
-          zIndex: 50,
-          transform: 'translate(-50%, -50%)',
-          left: `${rawCursor.x}px`,
-          top: `${rawCursor.y}px`,
-          transition: 'left 0.15s ease-out, top 0.15s ease-out'
+          zIndex: 9998,
+          top: 0,
+          left: 0,
+          transform: `translate3d(${rawCursor.x - 16}px, ${rawCursor.y - 16}px, 0)`,
+          transition: 'transform 0.08s ease-out'
         }}
       />
 
@@ -81,7 +83,7 @@ export default function App() {
         pointerEvents: 'none'
       }} />
 
-      {/* Forced Center Layout Canvas Grid Frame */}
+      {/* Centered Typography Layout Frame */}
       <main style={{
         position: 'absolute',
         inset: 0,
