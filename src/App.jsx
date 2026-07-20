@@ -26,8 +26,8 @@ export default function App() {
         style={{ left: `${rawCursor.x}px`, top: `${rawCursor.y}px` }}
       />
 
-      {/* New WebGL Generative Prism Shader Canvas Background */}
-      <div className="absolute inset-0 z-0 w-full h-full position-relative">
+      {/* Fixed Prism Background Canvas Container */}
+      <div className="absolute inset-0 z-0 w-full h-full relative">
         <Prism
           animationType="rotate"
           timeScale={0.5}
@@ -41,27 +41,25 @@ export default function App() {
         />
       </div>
 
-      {/* Ambient Lighting Vignette */}
+      {/* Ambient Lighting Vignette Overlay */}
       <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/20 via-transparent to-black/50 pointer-events-none" />
 
-      {/* Permanent Centered Layout Canvas Frame */}
-      <main className="absolute inset-0 z-30 min-h-screen flex items-center justify-center">
+      {/* Correct Center Grid Main Frame Layout Sheet */}
+      <main className="absolute inset-0 z-30 min-h-screen flex flex-col items-center justify-center">
         <div className="w-full flex flex-col items-center justify-center text-center text-white px-4 md:px-16 animate-fade-in">
           
-          <div className="flex flex-col items-center justify-center text-center">
-            <p className="text-cyan-400 uppercase tracking-[0.5em] text-xs md:text-sm font-bold mb-6">
-              UI/UX DESIGNER • FRONTEND DEVELOPER
-            </p>
-            <h1 className="text-[11vw] font-black leading-[0.85] tracking-tighter uppercase text-white select-none">
-              ATHARVA
-            </h1>
-            <h1 className="text-[11vw] font-black leading-[0.85] tracking-tighter uppercase text-white mb-8 select-none">
-              BULBULE
-            </h1>
-            <p className="max-w-xl text-zinc-200 text-lg md:text-xl font-medium leading-relaxed mx-auto select-none">
-              Crafting cinematic digital experiences through design, code, and visual storytelling.
-            </p>
-          </div>
+          <p className="text-cyan-400 uppercase tracking-[0.5em] text-xs md:text-sm font-bold mb-6">
+            UI/UX DESIGNER • FRONTEND DEVELOPER
+          </p>
+          <h1 className="text-[11vw] font-black leading-[0.85] tracking-tighter uppercase text-white select-none">
+            ATHARVA
+          </h1>
+          <h1 className="text-[11vw] font-black leading-[0.85] tracking-tighter uppercase text-white mb-8 select-none">
+            BULBULE
+          </h1>
+          <p className="max-w-xl text-zinc-200 text-lg md:text-xl font-medium leading-relaxed mx-auto select-none">
+            Crafting cinematic digital experiences through design, code, and visual storytelling.
+          </p>
 
         </div>
       </main>
