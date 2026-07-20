@@ -1,24 +1,21 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-
-html, body, #root {
+/* Global Base Styles */
+html, body {
   margin: 0;
   padding: 0;
   width: 100%;
   height: 100%;
   background-color: #050505;
-  font-family: 'Inter', sans-serif;
-  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-* {
-  box-sizing: border-box;
-  cursor: none !important;
-}
-
-canvas {
-  display: block;
-  width: 100% !important;
-  height: 100% !important;
+#root {
+  width: 100%;
+  height: 100%;
 }
