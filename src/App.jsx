@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import Prism from "./components/Prism";
-import FluidGlass from "./components/FluidGlass";
 import BorderGlow from "./components/BorderGlow";
 import ProfileCard from "./components/ProfileCard";
 
@@ -63,7 +62,7 @@ export default function App() {
         }}
       />
 
-      {/* 1. WebGL Prism Shader Background Layer */}
+      {/* 1. WebGL Prism Shader Background Matrix */}
       <div style={{ position: 'absolute', inset: 0, zIndex: 0, width: '100%', height: '100%' }}>
         <Prism
           animationType="rotate"
@@ -78,32 +77,79 @@ export default function App() {
         />
       </div>
 
-      {/* VIEW STATE 1: Standard Liquid Text Interface */}
+      {/* VIEW STATE 1: Clean Typography Main Screen */}
       {!showProfile && (
         <>
-          <div style={{ position: 'absolute', inset: 0, zIndex: 10, width: '100%', height: '100%' }}>
-            <FluidGlass 
-              mode="lens"
-              lensProps={{
-                scale: 0.24,
-                ior: 1.35,
-                thickness: 8,
-                chromaticAberration: 0.25,
-                anisotropy: 0.05
-              }}
-            />
-          </div>
+          {/* Glass Refraction Cursor Tracker Effect (Works across full website canvas without going black) */}
+          <div 
+            style={{
+              position: 'fixed',
+              width: '180px',
+              height: '180px',
+              borderRadius: '50%',
+              pointerEvents: 'none',
+              zIndex: 15,
+              top: 0,
+              left: 0,
+              transform: `translate3d(${rawCursor.x - 90}px, ${rawCursor.y - 90}px, 0)`,
+              backdropFilter: 'blur(4px) brightness(1.2) contrast(1.1)',
+              boxShadow: '0 0 40px rgba(255,255,255,0.1), inset 0 0 20px rgba(255,255,255,0.2)',
+              border: '1px solid rgba(255,255,255,0.25)'
+            }}
+          />
 
-          {/* HTML Overlay For the Interactive Action Navigation Button */}
+          <main style={{
+            position: 'absolute',
+            inset: 0,
+            zIndex: 10,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            minHeight: '100vh',
+            width: '100%'
+          }}>
+            <div style={{ width: '100%', textAlign: 'center', color: '#ffffff', padding: '0 16px' }}>
+              <p style={{
+                color: '#22d3ee',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5em',
+                fontSize: '14px',
+                fontWeight: 'bold',
+                marginBottom: '16px'
+              }}>
+                UI/UX DESIGNER • FRONTEND DEVELOPER
+              </p>
+              <h1 style={{
+                fontSize: '11vw',
+                fontWeight: 900,
+                lineHeight: 0.85,
+                letterSpacing: '-0.03em',
+                textTransform: 'uppercase',
+                margin: '0'
+              }}>
+                ATHARVA
+              </h1>
+              <h1 style={{
+                fontSize: '11vw',
+                fontWeight: 900,
+                lineHeight: 0.85,
+                letterSpacing: '-0.03em',
+                textTransform: 'uppercase',
+                margin: '0'
+              }}>
+                BULBULE
+              </h1>
+            </div>
+          </main>
+
+          {/* Centered Enter Profile Button */}
           <div style={{
             position: 'absolute',
-            bottom: '12%',
+            bottom: '15%',
             left: '50%',
             transform: 'translateX(-50%)',
-            zIndex: 30,
-            display: 'flex',
-            justifyContent: 'center',
-            width: '100%'
+            zIndex: 30
           }}>
             <button
               onClick={() => setShowProfile(true)}
@@ -113,23 +159,15 @@ export default function App() {
                 borderRadius: '50px',
                 padding: '14px 36px',
                 color: '#ffffff',
-                fontSize: '15px',
+                fontSize: '14px',
                 fontWeight: '600',
                 letterSpacing: '0.15em',
                 textTransform: 'uppercase',
                 cursor: 'pointer',
                 backdropFilter: 'blur(10px)',
-                boxShadow: '0 4px 20px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1)',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
                 transition: 'all 0.3s ease',
                 pointerEvents: 'auto'
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.borderColor = '#22d3ee';
-                e.target.style.boxShadow = '0 0 15px rgba(34, 211, 238, 0.4)';
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.borderColor = 'rgba(34, 211, 238, 0.4)';
-                e.target.style.boxShadow = '0 4px 20px rgba(0,0,0,0.4)';
               }}
             >
               Enter Profile
@@ -138,67 +176,55 @@ export default function App() {
         </>
       )}
 
-      {/* VIEW STATE 2: Profile Cards Wrapped with BorderGlow */}
+      {/* VIEW STATE 2: Clean Profile Card State */}
       {showProfile && (
         <div style={{
           position: 'absolute',
           inset: 0,
           zIndex: 40,
           display: 'flex',
-          flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          background: 'rgba(0,0,0,0.4)',
-          backdropFilter: 'blur(8px)',
-          animation: 'fadeIn 0.5s ease-out forwards',
+          background: 'rgba(0,0,0,0.6)',
+          backdropFilter: 'blur(12px)',
           padding: '20px'
         }}>
-          
           <BorderGlow
             edgeSensitivity={40}
             glowColor="190 90% 60%"
-            backgroundColor="rgba(15, 12, 22, 0.75)"
-            borderRadius={30}
+            backgroundColor="#0b0813"
+            borderRadius={24}
             glowRadius={50}
             glowIntensity={1.2}
-            coneSpread={28}
-            animated={true}
             colors={['#22d3ee', '#c084fc', '#f472b6']}
           >
-            <div style={{ padding: '4px', position: 'relative' }}>
+            <div style={{ padding: '8px' }}>
               <ProfileCard
                 name="Atharva Bulbule"
                 title="UI/UX Designer • Frontend Developer"
                 handle="atharvabulbule"
-                status="Available for Projects"
+                status="Online"
                 contactText="Go Back"
-                avatarUrl="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=500&q=80" // Replace with yours
+                avatarUrl="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=500&q=80"
                 showUserInfo={true}
                 enableTilt={true}
-                enableMobileTilt={false}
                 onContactClick={() => setShowProfile(false)}
                 behindGlowEnabled={true}
-                behindGlowColor="rgba(34, 211, 238, 0.4)"
-                innerGradient="linear-gradient(145deg, rgba(34, 211, 238, 0.15) 0%, rgba(192, 132, 252, 0.05) 100%)"
+                behindGlowColor="rgba(34, 211, 238, 0.5)"
               />
             </div>
           </BorderGlow>
-
         </div>
       )}
 
-      {/* Ambient Vignette Overlay */}
+      {/* Ambient Shading Overlay */}
       <div style={{
         position: 'absolute',
         inset: 0,
-        zIndex: 25,
-        background: 'linear-gradient(to bottom, rgba(0,0,0,0.15), transparent, rgba(0,0,0,0.45))',
+        zIndex: 5,
+        background: 'linear-gradient(to bottom, rgba(0,0,0,0.1), transparent, rgba(0,0,0,0.4))',
         pointerEvents: 'none'
       }} />
-
-      <style>{`
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-      `}</style>
 
     </div>
   );
