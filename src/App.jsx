@@ -1,9 +1,12 @@
 import { useState, useEffect } from "react";
 import Prism from "./components/Prism";
 import FluidGlass from "./components/FluidGlass";
+import BorderGlow from "./components/BorderGlow";
+import ProfileCard from "./components/ProfileCard";
 
 export default function App() {
   const [rawCursor, setRawCursor] = useState({ x: 0, y: 0 });
+  const [showProfile, setShowProfile] = useState(false);
 
   useEffect(() => {
     const handleGlobalMouseMove = (e) => {
@@ -75,28 +78,127 @@ export default function App() {
         />
       </div>
 
-      {/* 2. Fluid Glass Canvas Integration Layer */}
-      <div style={{ position: 'absolute', inset: 0, zIndex: 10, width: '100%', height: '100%' }}>
-        <FluidGlass 
-          mode="lens"
-          lensProps={{
-            scale: 0.24,
-            ior: 1.35,
-            thickness: 8,
-            chromaticAberration: 0.25,
-            anisotropy: 0.05
-          }}
-        />
-      </div>
+      {/* VIEW STATE 1: Standard Liquid Text Interface */}
+      {!showProfile && (
+        <>
+          <div style={{ position: 'absolute', inset: 0, zIndex: 10, width: '100%', height: '100%' }}>
+            <FluidGlass 
+              mode="lens"
+              lensProps={{
+                scale: 0.24,
+                ior: 1.35,
+                thickness: 8,
+                chromaticAberration: 0.25,
+                anisotropy: 0.05
+              }}
+            />
+          </div>
 
-      {/* Ambient Lighting Vignette Overlay */}
+          {/* HTML Overlay For the Interactive Action Navigation Button */}
+          <div style={{
+            position: 'absolute',
+            bottom: '12%',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 30,
+            display: 'flex',
+            justifyContent: 'center',
+            width: '100%'
+          }}>
+            <button
+              onClick={() => setShowProfile(true)}
+              style={{
+                background: 'linear-gradient(135deg, rgba(34, 211, 238, 0.2) 0%, rgba(34, 211, 238, 0.05) 100%)',
+                border: '1px solid rgba(34, 211, 238, 0.4)',
+                borderRadius: '50px',
+                padding: '14px 36px',
+                color: '#ffffff',
+                fontSize: '15px',
+                fontWeight: '600',
+                letterSpacing: '0.15em',
+                textTransform: 'uppercase',
+                cursor: 'pointer',
+                backdropFilter: 'blur(10px)',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1)',
+                transition: 'all 0.3s ease',
+                pointerEvents: 'auto'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.borderColor = '#22d3ee';
+                e.target.style.boxShadow = '0 0 15px rgba(34, 211, 238, 0.4)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.borderColor = 'rgba(34, 211, 238, 0.4)';
+                e.target.style.boxShadow = '0 4px 20px rgba(0,0,0,0.4)';
+              }}
+            >
+              Enter Profile
+            </button>
+          </div>
+        </>
+      )}
+
+      {/* VIEW STATE 2: Profile Cards Wrapped with BorderGlow */}
+      {showProfile && (
+        <div style={{
+          position: 'absolute',
+          inset: 0,
+          zIndex: 40,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: 'rgba(0,0,0,0.4)',
+          backdropFilter: 'blur(8px)',
+          animation: 'fadeIn 0.5s ease-out forwards',
+          padding: '20px'
+        }}>
+          
+          <BorderGlow
+            edgeSensitivity={40}
+            glowColor="190 90% 60%"
+            backgroundColor="rgba(15, 12, 22, 0.75)"
+            borderRadius={30}
+            glowRadius={50}
+            glowIntensity={1.2}
+            coneSpread={28}
+            animated={true}
+            colors={['#22d3ee', '#c084fc', '#f472b6']}
+          >
+            <div style={{ padding: '4px', position: 'relative' }}>
+              <ProfileCard
+                name="Atharva Bulbule"
+                title="UI/UX Designer • Frontend Developer"
+                handle="atharvabulbule"
+                status="Available for Projects"
+                contactText="Go Back"
+                avatarUrl="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=500&q=80" // Replace with yours
+                showUserInfo={true}
+                enableTilt={true}
+                enableMobileTilt={false}
+                onContactClick={() => setShowProfile(false)}
+                behindGlowEnabled={true}
+                behindGlowColor="rgba(34, 211, 238, 0.4)"
+                innerGradient="linear-gradient(145deg, rgba(34, 211, 238, 0.15) 0%, rgba(192, 132, 252, 0.05) 100%)"
+              />
+            </div>
+          </BorderGlow>
+
+        </div>
+      )}
+
+      {/* Ambient Vignette Overlay */}
       <div style={{
         position: 'absolute',
         inset: 0,
-        zIndex: 20,
-        background: 'linear-gradient(to bottom, rgba(0,0,0,0.1), transparent, rgba(0,0,0,0.4))',
+        zIndex: 25,
+        background: 'linear-gradient(to bottom, rgba(0,0,0,0.15), transparent, rgba(0,0,0,0.45))',
         pointerEvents: 'none'
       }} />
+
+      <style>{`
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+      `}</style>
 
     </div>
   );

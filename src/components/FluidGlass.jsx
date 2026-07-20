@@ -2,13 +2,7 @@
 import * as THREE from 'three';
 import { useRef, useState, useEffect, memo } from 'react';
 import { Canvas, createPortal, useFrame, useThree } from '@react-three/fiber';
-import {
-  useFBO,
-  useGLTF,
-  Preload,
-  MeshTransmissionMaterial,
-  Text
-} from '@react-three/drei';
+import { useFBO, useGLTF, Preload, MeshTransmissionMaterial, Text } from '@react-three/drei';
 import { easing } from 'maath';
 
 export default function FluidGlass({ mode = 'lens', lensProps = {}, barProps = {}, cubeProps = {} }) {
@@ -66,8 +60,6 @@ const ModeWrapper = memo(function ModeWrapper({
     gl.setRenderTarget(buffer);
     gl.render(scene, camera);
     gl.setRenderTarget(null);
-
-    // Keep background completely transparent so the Prism colors show through
     gl.setClearColor(0x000000, 0);
   });
 
@@ -79,7 +71,7 @@ const ModeWrapper = memo(function ModeWrapper({
         <group>
           {/* Subtitle Line */}
           <Text
-            position={[0, 1.6, 12]}
+            position={[0, 1.2, 12]}
             fontSize={0.075}
             letterSpacing={0.4}
             color="#22d3ee"
@@ -89,9 +81,9 @@ const ModeWrapper = memo(function ModeWrapper({
             UI/UX DESIGNER • FRONTEND DEVELOPER
           </Text>
 
-          {/* Perfectly Proportioned Main Typography Headers */}
+          {/* FIXED: Reduced gap dramatically between text elements */}
           <Text
-            position={[0, 0.5, 12]}
+            position={[0, 0.35, 12]}
             fontSize={0.46}
             fontWeight={900}
             letterSpacing={-0.03}
@@ -102,7 +94,7 @@ const ModeWrapper = memo(function ModeWrapper({
             ATHARVA
           </Text>
           <Text
-            position={[0, -0.5, 12]}
+            position={[0, -0.35, 12]}
             fontSize={0.46}
             fontWeight={900}
             letterSpacing={-0.03}
@@ -115,7 +107,7 @@ const ModeWrapper = memo(function ModeWrapper({
 
           {/* Description Tagline */}
           <Text
-            position={[0, -1.3, 12]}
+            position={[0, -1.05, 12]}
             fontSize={0.095}
             maxWidth={3.5}
             textAlign="center"
