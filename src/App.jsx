@@ -75,7 +75,7 @@ export default function App() {
         />
       </div>
 
-      {/* 2. Fluid Glass Canvas Integration Layer */}
+      {/* 2. Fluid Glass Canvas Integration Layer (Where your text now lives safely inside) */}
       <div style={{ position: 'absolute', inset: 0, zIndex: 10, width: '100%', height: '100%' }}>
         <FluidGlass 
           mode="lens"
