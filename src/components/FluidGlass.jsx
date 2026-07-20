@@ -6,7 +6,8 @@ import {
   useFBO,
   useGLTF,
   Preload,
-  MeshTransmissionMaterial
+  MeshTransmissionMaterial,
+  Text
 } from '@react-three/drei';
 import { easing } from 'maath';
 
@@ -14,13 +15,9 @@ export default function FluidGlass({ mode = 'lens', lensProps = {}, barProps = {
   const Wrapper = mode === 'bar' ? Bar : mode === 'cube' ? Cube : Lens;
   const rawOverrides = mode === 'bar' ? barProps : mode === 'cube' ? cubeProps : lensProps;
 
-  // Pull children content explicitly inside the global canvas scope wrapper
-  const { children, ...modeProps } = rawOverrides;
-
   return (
     <Canvas camera={{ position: [0, 0, 20], fov: 15 }} gl={{ alpha: true }}>
-      <Wrapper modeProps={modeProps}>
-        {children}
+      <Wrapper modeProps={rawOverrides}>
         <Preload />
       </Wrapper>
     </Canvas>
@@ -28,7 +25,6 @@ export default function FluidGlass({ mode = 'lens', lensProps = {}, barProps = {
 }
 
 const ModeWrapper = memo(function ModeWrapper({
-  children,
   glb,
   geometryKey,
   lockToBottom = false,
@@ -63,7 +59,7 @@ const ModeWrapper = memo(function ModeWrapper({
       if (modeProps.scale == null) {
         const maxWorld = v.width * 0.9;
         const desired = maxWorld / geoWidthRef.current;
-        ref.current.scale.setScalar(Math.min(0.15, desired));
+        ref.current.scale.setScalar(Math.min(0.24, desired));
       }
     }
 
@@ -71,7 +67,7 @@ const ModeWrapper = memo(function ModeWrapper({
     gl.render(scene, camera);
     gl.setRenderTarget(null);
 
-    // FIXED: Clear internal rendering void mask with 0 alpha to allow background layers to view perfectly
+    // Keep background completely clear so the Prism colors shine through perfectly
     gl.setClearColor(0x000000, 0);
   });
 
@@ -79,19 +75,73 @@ const ModeWrapper = memo(function ModeWrapper({
 
   return (
     <>
-      {createPortal(children, scene)}
+      {createPortal(
+        <group>
+          {/* Subtitle Line */}
+          <Text
+            position={[0, 1.8, 12]}
+            fontSize={0.08}
+            letterSpacing={0.4}
+            color="#22d3ee"
+            anchorX="center"
+            anchorY="middle"
+          >
+            UI/UX DESIGNER • FRONTEND DEVELOPER
+          </Text>
+
+          {/* Liquid Refract Heavy Typography Headers */}
+          <Text
+            position={[0, 0.6, 12]}
+            fontSize={0.8}
+            fontWeight={900}
+            letterSpacing={-0.05}
+            color="white"
+            anchorX="center"
+            anchorY="middle"
+          >
+            ATHARVA
+          </Text>
+          <Text
+            position={[0, -0.5, 12]}
+            fontSize={0.8}
+            fontWeight={900}
+            letterSpacing={-0.05}
+            color="white"
+            anchorX="center"
+            anchorY="middle"
+          >
+            BULBULE
+          </Text>
+
+          {/* Description Tagline */}
+          <Text
+            position={[0, -1.4, 12]}
+            fontSize={0.11}
+            maxWidth={4}
+            textAlign="center"
+            color="#d4d4d8"
+            anchorX="center"
+            anchorY="middle"
+          >
+            Crafting cinematic digital experiences through design, code, and visual storytelling.
+          </Text>
+        </group>,
+        scene
+      )}
+      
       <mesh scale={[vp.width, vp.height, 1]}>
         <planeGeometry />
-        <meshBasicMaterial map={buffer.texture} transparent opacity={1} />
+        <meshBasicMaterial map={buffer.texture} transparent />
       </mesh>
+      
       {nodes[geometryKey] && (
-        <mesh ref={ref} scale={scale ?? 0.15} rotation-x={Math.PI / 2} geometry={nodes[geometryKey]?.geometry} {...props}>
+        <mesh ref={ref} scale={scale ?? 0.24} rotation-x={Math.PI / 2} geometry={nodes[geometryKey]?.geometry} {...props}>
           <MeshTransmissionMaterial
             buffer={buffer.texture}
-            ior={ior ?? 1.15}
-            thickness={thickness ?? 5}
-            anisotropy={anisotropy ?? 0.01}
-            chromaticAberration={chromaticAberration ?? 0.1}
+            ior={ior ?? 1.3}
+            thickness={thickness ?? 8}
+            anisotropy={anisotropy ?? 0.1}
+            chromaticAberration={chromaticAberration ?? 0.3}
             transmission={1.0}
             roughness={0.0}
             transparent
@@ -105,7 +155,4 @@ const ModeWrapper = memo(function ModeWrapper({
 
 function Lens({ modeProps, ...p }) { return <ModeWrapper glb="/assets/3d/lens.glb" geometryKey="Cylinder" followPointer modeProps={modeProps} {...p} />; }
 function Cube({ modeProps, ...p }) { return <ModeWrapper glb="/assets/3d/cube.glb" geometryKey="Cube" followPointer modeProps={modeProps} {...p} />; }
-function Bar({ modeProps = {}, ...p }) {
-  const defaultMat = { transmission: 1, roughness: 0, thickness: 10, ior: 1.15, color: '#ffffff' };
-  return <ModeWrapper glb="/assets/3d/bar.glb" geometryKey="Cube" lockToBottom followPointer={false} modeProps={{ ...defaultMat, ...modeProps }} {...p} />;
-}
+function Bar({ modeProps = {}, ...p }) { return <ModeWrapper glb="/assets/3d/bar.glb" geometryKey="Cube" lockToBottom followPointer={false} modeProps={modeProps} {...p} />; }
