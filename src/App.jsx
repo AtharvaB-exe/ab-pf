@@ -4,10 +4,16 @@ import FluidGlass from "./components/FluidGlass";
 
 export default function App() {
   const [rawCursor, setRawCursor] = useState({ x: 0, y: 0 });
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
     const handleGlobalMouseMove = (e) => {
       setRawCursor({ x: e.clientX, y: e.clientY });
+      
+      // Calculate normal vector matrix (-1 to 1) for the glass positioning engine
+      const x = (e.clientX / window.innerWidth) * 2 - 1;
+      const y = -(e.clientY / window.innerHeight) * 2 + 1;
+      setMousePos({ x, y });
     };
 
     window.addEventListener("mousemove", handleGlobalMouseMove);
@@ -43,7 +49,7 @@ export default function App() {
         }}
       />
       
-      {/* Restored Outer Tracing Circle */}
+      {/* Outer Tracing Circle */}
       <div 
         style={{
           position: 'fixed',
@@ -75,19 +81,8 @@ export default function App() {
         />
       </div>
 
-      {/* React Bits Fluid Glass Refraction Pass Layer */}
-      <div style={{ position: 'absolute', inset: 0, zIndex: 10, width: '100%', height: '100%', pointerEvents: 'none' }}>
-        <FluidGlass 
-          mode="lens"
-          lensProps={{
-            scale: 0.25,
-            ior: 1.15,
-            thickness: 5,
-            chromaticAberration: 0.1,
-            anisotropy: 0.01  
-          }}
-        />
-      </div>
+      {/* Glass Refraction Overlay Engine */}
+      <FluidGlass mousePos={mousePos} />
 
       {/* Ambient Lighting Vignette Overlay */}
       <div style={{
