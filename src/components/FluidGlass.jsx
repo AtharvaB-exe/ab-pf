@@ -1,14 +1,8 @@
 /* eslint-disable react/no-unknown-property */
 import * as THREE from 'three';
 import { useRef, useState, useEffect, memo } from 'react';
-import { Canvas, createPortal, useFrame, useThree } from '@react-three/fiber';
-import {
-  useFBO,
-  useGLTF,
-  Preload,
-  MeshTransmissionMaterial,
-  Text
-} from '@react-three/drei';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { useGLTF, Preload, MeshTransmissionMaterial } from '@react-three/drei';
 import { easing } from 'maath';
 
 export default function FluidGlass({ mode = 'lens', lensProps = {}, barProps = {}, cubeProps = {} }) {
@@ -17,9 +11,8 @@ export default function FluidGlass({ mode = 'lens', lensProps = {}, barProps = {
 
   return (
     <Canvas camera={{ position: [0, 0, 20], fov: 15 }} gl={{ alpha: true }}>
-      <Wrapper modeProps={rawOverrides}>
-        <Preload />
-      </Wrapper>
+      <Wrapper modeProps={rawOverrides} />
+      <Preload />
     </Canvas>
   );
 }
@@ -34,9 +27,6 @@ const ModeWrapper = memo(function ModeWrapper({
 }) {
   const ref = useRef();
   const { nodes } = useGLTF(glb);
-  const buffer = useFBO();
-  const { viewport: vp } = useThree();
-  const [scene] = useState(() => new THREE.Scene());
   const geoWidthRef = useRef(1);
 
   useEffect(() => {
@@ -63,11 +53,6 @@ const ModeWrapper = memo(function ModeWrapper({
       }
     }
 
-    gl.setRenderTarget(buffer);
-    gl.render(scene, camera);
-    gl.setRenderTarget(null);
-
-    // Keep background completely clear so the Prism colors shine through perfectly
     gl.setClearColor(0x000000, 0);
   });
 
@@ -75,73 +60,13 @@ const ModeWrapper = memo(function ModeWrapper({
 
   return (
     <>
-      {createPortal(
-        <group>
-          {/* Subtitle Line */}
-          <Text
-            position={[0, 1.4, 12]}
-            fontSize={0.07}
-            letterSpacing={0.4}
-            color="#22d3ee"
-            anchorX="center"
-            anchorY="middle"
-          >
-            UI/UX DESIGNER • FRONTEND DEVELOPER
-          </Text>
-
-          {/* Liquid Refract Heavy Typography Headers */}
-          <Text
-            position={[0, 0.4, 12]}
-            fontSize={0.48}
-            fontWeight={900}
-            letterSpacing={-0.03}
-            color="white"
-            anchorX="center"
-            anchorY="middle"
-          >
-            ATHARVA
-          </Text>
-          <Text
-            position={[0, -0.4, 12]}
-            fontSize={0.48}
-            fontWeight={900}
-            letterSpacing={-0.03}
-            color="white"
-            anchorX="center"
-            anchorY="middle"
-          >
-            BULBULE
-          </Text>
-
-          {/* Description Tagline */}
-          <Text
-            position={[0, -1.1, 12]}
-            fontSize={0.09}
-            maxWidth={3.2}
-            textAlign="center"
-            color="#d4d4d8"
-            anchorX="center"
-            anchorY="middle"
-          >
-            Crafting cinematic digital experiences through design, code, and visual storytelling.
-          </Text>
-        </group>,
-        scene
-      )}
-      
-      <mesh scale={[vp.width, vp.height, 1]}>
-        <planeGeometry />
-        <meshBasicMaterial map={buffer.texture} transparent />
-      </mesh>
-      
       {nodes[geometryKey] && (
         <mesh ref={ref} scale={scale ?? 0.24} rotation-x={Math.PI / 2} geometry={nodes[geometryKey]?.geometry} {...props}>
           <MeshTransmissionMaterial
-            buffer={buffer.texture}
-            ior={ior ?? 1.3}
-            thickness={thickness ?? 8}
-            anisotropy={anisotropy ?? 0.1}
-            chromaticAberration={chromaticAberration ?? 0.3}
+            ior={ior ?? 1.25}
+            thickness={thickness ?? 6}
+            anisotropy={anisotropy ?? 0.05}
+            chromaticAberration={chromaticAberration ?? 0.2}
             transmission={1.0}
             roughness={0.0}
             transparent
