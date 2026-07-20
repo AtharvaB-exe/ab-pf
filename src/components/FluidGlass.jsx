@@ -3,7 +3,6 @@ import * as THREE from 'three';
 import { useRef, useState, useEffect, memo } from 'react';
 import { Canvas, createPortal, useFrame, useThree } from '@react-three/fiber';
 import {
-  useFBO,
   useGLTF,
   Preload,
   MeshTransmissionMaterial
@@ -35,7 +34,6 @@ const ModeWrapper = memo(function ModeWrapper({
 }) {
   const ref = useRef();
   const { nodes } = useGLTF(glb);
-  const buffer = useFBO();
   const { viewport: vp } = useThree();
   const [scene] = useState(() => new THREE.Scene());
   const geoWidthRef = useRef(1);
@@ -64,11 +62,7 @@ const ModeWrapper = memo(function ModeWrapper({
       }
     }
 
-    gl.setRenderTarget(buffer);
-    gl.render(scene, camera);
-    gl.setRenderTarget(null);
-
-    // Keep clear color transparent so your Prism backdrop stays perfectly visible
+    // FIXED: Keeps the rendering context fully transparent so layers below shine through
     gl.setClearColor(0x000000, 0);
   });
 
@@ -77,18 +71,16 @@ const ModeWrapper = memo(function ModeWrapper({
   return (
     <>
       {createPortal(children, scene)}
-      <mesh scale={[vp.width, vp.height, 1]}>
-        <planeGeometry />
-        <meshBasicMaterial map={buffer.texture} transparent />
-      </mesh>
       {nodes[geometryKey] && (
         <mesh ref={ref} scale={scale ?? 0.15} rotation-x={Math.PI / 2} geometry={nodes[geometryKey]?.geometry} {...props}>
           <MeshTransmissionMaterial
-            buffer={buffer.texture}
             ior={ior ?? 1.15}
             thickness={thickness ?? 5}
             anisotropy={anisotropy ?? 0.01}
             chromaticAberration={chromaticAberration ?? 0.1}
+            transmission={1.0}
+            roughness={0.05}
+            transparent
             {...extraMat}
           />
         </mesh>
