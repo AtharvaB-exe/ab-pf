@@ -1,21 +1,5 @@
-import { useState, useEffect, Component } from "react";
+import { useState, useEffect } from "react";
 import Prism from "./components/Prism";
-
-// Safe Error Boundary to catch any WebGL/OGL crashes silently
-class WebGLErrorBoundary extends Component {
-  state = { hasError: false };
-  static getDerivedStateFromError() { return { hasError: true }; }
-  componentDidCatch(error, errorInfo) {
-    console.error("WebGL Background crashed:", error, errorInfo);
-  }
-  render() {
-    if (this.state.hasError) {
-      // Fallback clean dark gradient if WebGL fails
-      return <div className="absolute inset-0 bg-gradient-to-tr from-[#0a0518] via-[#050505] to-[#0c1020] opacity-90" />;
-    }
-    return this.props.children;
-  }
-}
 
 export default function App() {
   const [rawCursor, setRawCursor] = useState({ x: 0, y: 0 });
@@ -30,52 +14,135 @@ export default function App() {
   }, []);
 
   return (
-    <div className="relative w-full h-screen bg-[#050505] overflow-hidden font-sans cursor-none select-none">
+    <div style={{
+      position: 'relative',
+      width: '100vw',
+      height: '100vh',
+      backgroundColor: '#050505',
+      overflow: 'hidden',
+      fontFamily: 'sans-serif',
+      cursor: 'none',
+      userSelect: 'none'
+    }}>
       
       {/* Precision Dynamic Cursor Dot */}
       <div 
-        className="fixed w-2 h-2 bg-cyan-400 rounded-full pointer-events-none z-50 shadow-[0_0_10px_#22d3ee] -translate-x-1/2 -translate-y-1/2 transition-all duration-75 ease-out"
-        style={{ left: `${rawCursor.x}px`, top: `${rawCursor.y}px` }}
+        style={{
+          position: 'fixed',
+          width: '8px',
+          height: '8px',
+          backgroundColor: '#22d3ee',
+          borderRadius: '50%',
+          pointerEvents: 'none',
+          zIndex: 50,
+          boxShadow: '0 0 10px #22d3ee',
+          transform: 'translate(-50%, -50%)',
+          left: `${rawCursor.x}px`,
+          top: `${rawCursor.y}px`
+        }}
       />
       <div 
-        className="fixed w-8 h-8 border border-white/20 rounded-full pointer-events-none z-50 -translate-x-1/2 -translate-y-1/2 transition-all duration-150 ease-out"
-        style={{ left: `${rawCursor.x}px`, top: `${rawCursor.y}px` }}
+        style={{
+          position: 'fixed',
+          width: '32px',
+          height: '32px',
+          border: '1px solid rgba(255, 255, 255, 0.2)',
+          borderRadius: '50%',
+          pointerEvents: 'none',
+          zIndex: 50,
+          transform: 'translate(-50%, -50%)',
+          left: `${rawCursor.x}px`,
+          top: `${rawCursor.y}px`,
+          transition: 'left 0.15s ease-out, top 0.15s ease-out'
+        }}
       />
 
-      {/* Error-Isolated Prism Background Layer */}
-      <div className="absolute inset-0 z-0 w-full h-full">
-        <WebGLErrorBoundary>
-          <Prism
-            animationType="rotate"
-            timeScale={0.5}
-            height={3.5}
-            baseWidth={5.5}
-            scale={3.6}
-            hueShift={0}
-            colorFrequency={1}
-            noise={0.5}
-            glow={1}
-          />
-        </WebGLErrorBoundary>
+      {/* WebGL Prism Shader Background */}
+      <div style={{ position: 'absolute', inset: 0, zIndex: 0, width: '100%', height: '100%' }}>
+        <Prism
+          animationType="rotate"
+          timeScale={0.5}
+          height={3.5}
+          baseWidth={5.5}
+          scale={3.6}
+          hueShift={0}
+          colorFrequency={1}
+          noise={0.5}
+          glow={1}
+        />
       </div>
 
       {/* Ambient Lighting Vignette Overlay */}
-      <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/20 via-transparent to-black/50 pointer-events-none" />
+      <div style={{
+        position: 'absolute',
+        inset: 0,
+        zIndex: 1,
+        background: 'linear-gradient(to bottom, rgba(0,0,0,0.2), transparent, rgba(0,0,0,0.5))',
+        pointerEvents: 'none'
+      }} />
 
-      {/* Fixed Center Grid Main Frame Layout Sheet */}
-      <main className="absolute inset-0 z-30 min-h-screen flex flex-col items-center justify-center pointer-events-none">
-        <div className="w-full flex flex-col items-center justify-center text-center text-white px-4 md:px-16 animate-fade-in pointer-events-auto">
+      {/* Forced Center Layout Canvas Grid Frame */}
+      <main style={{
+        position: 'absolute',
+        inset: 0,
+        zIndex: 30,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '100vh',
+        width: '100%',
+        boxSizing: 'border-box'
+      }}>
+        <div style={{
+          width: '100%',
+          textAlign: 'center',
+          color: '#ffffff',
+          padding: '0 16px',
+          boxSizing: 'border-box',
+          animation: 'fadeIn 0.8s ease-out forwards'
+        }}>
           
-          <p className="text-cyan-400 uppercase tracking-[0.5em] text-xs md:text-sm font-bold mb-6">
+          <p style={{
+            color: '#22d3ee',
+            textTransform: 'uppercase',
+            letterSpacing: '0.5em',
+            fontSize: '14px',
+            fontWeight: 'bold',
+            marginBottom: '24px'
+          }}>
             UI/UX DESIGNER • FRONTEND DEVELOPER
           </p>
-          <h1 className="text-[11vw] font-black leading-[0.85] tracking-tighter uppercase text-white select-none">
+          <h1 style={{
+            fontSize: '11vw',
+            fontWeight: 900,
+            lineHeight: 0.85,
+            letterSpacing: '-0.05em',
+            textTransform: 'uppercase',
+            color: '#ffffff',
+            margin: '0'
+          }}>
             ATHARVA
           </h1>
-          <h1 className="text-[11vw] font-black leading-[0.85] tracking-tighter uppercase text-white mb-8 select-none">
+          <h1 style={{
+            fontSize: '11vw',
+            fontWeight: 900,
+            lineHeight: 0.85,
+            letterSpacing: '-0.05em',
+            textTransform: 'uppercase',
+            color: '#ffffff',
+            margin: '0 0 32px 0'
+          }}>
             BULBULE
           </h1>
-          <p className="max-w-xl text-zinc-200 text-lg md:text-xl font-medium leading-relaxed mx-auto select-none">
+          <p style={{
+            maxWidth: '560px',
+            color: '#d4d4d8',
+            fontSize: '20px',
+            fontWeight: 500,
+            lineHeight: 1.6,
+            margin: '0 auto'
+          }}>
             Crafting cinematic digital experiences through design, code, and visual storytelling.
           </p>
 
@@ -84,7 +151,6 @@ export default function App() {
 
       <style>{`
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .animate-fade-in { animation: fadeIn 0.8s ease-out forwards; }
       `}</style>
 
     </div>
