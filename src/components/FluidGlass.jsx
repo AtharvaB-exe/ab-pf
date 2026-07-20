@@ -1,148 +1,55 @@
-/* eslint-disable react/no-unknown-property */
-import * as THREE from 'three';
-import { useRef, useState, useEffect, memo } from 'react';
-import { Canvas, createPortal, useFrame, useThree } from '@react-three/fiber';
-import { useFBO, useGLTF, Preload, MeshTransmissionMaterial, Text } from '@react-three/drei';
-import { easing } from 'maath';
+import React from 'react';
 
-export default function FluidGlass({ mode = 'lens', lensProps = {} }) {
-  const Wrapper = mode === 'cube' ? Cube : mode === 'bar' ? Bar : Lens;
+export default function FluidGlass({ mousePos = { x: 0, y: 0 } }) {
+  // Translate tracking coordinates smoothly to screen alignment values
+  const screenX = `${(mousePos.x + 1) * 50}%`;
+  const screenY = `${(-mousePos.y + 1) * 50}%`;
+
   return (
-    <Canvas camera={{ position: [0, 0, 20], fov: 15 }} gl={{ alpha: true }}>
-      <Wrapper modeProps={lensProps} />
-      <Preload />
-    </Canvas>
+    <div style={{
+      position: 'absolute',
+      inset: 0,
+      zIndex: 20,
+      width: '100%',
+      height: '100%',
+      pointerEvents: 'none'
+    }}>
+      {/* Dynamic 3D Physical Glass Distortion Shield */}
+      <div 
+        style={{
+          position: 'absolute',
+          width: '260px',
+          height: '260px',
+          borderRadius: '50%',
+          left: screenX,
+          top: screenY,
+          transform: 'translate(-50%, -50%)',
+          
+          // Magnification and refraction filters
+          backdropFilter: 'blur(4px) contrast(1.2) saturate(1.25) scale(1.06)',
+          WebkitBackdropFilter: 'blur(4px) contrast(1.2) saturate(1.25) scale(1.06)',
+          
+          // Chromatic lighting highlights and shadow bounds
+          background: 'radial-gradient(circle at 35% 35%, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.05) 45%, rgba(0,0,0,0.3) 100%)',
+          border: '1px solid rgba(255, 255, 255, 0.3)',
+          boxShadow: 'inset 0 0 25px rgba(255,255,255,0.15), 0 25px 50px rgba(0,0,0,0.6)',
+          
+          // Easing math to match custom tracking rings
+          transition: 'left 0.1s cubic-bezier(0.25, 1, 0.5, 1), top 0.1s cubic-bezier(0.25, 1, 0.5, 1)'
+        }}
+      >
+        {/* Synthetic specular reflection glare flare */}
+        <div style={{
+          position: 'absolute',
+          top: '12%',
+          left: '12%',
+          width: '45px',
+          height: '20px',
+          background: 'radial-gradient(ellipse at center, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0) 75%)',
+          transform: 'rotate(-28deg)',
+          borderRadius: '50%'
+        }} />
+      </div>
+    </div>
   );
 }
-
-const ModeWrapper = memo(function ModeWrapper({
-  glb,
-  geometryKey,
-  lockToBottom = false,
-  followPointer = true,
-  modeProps = {},
-  ...props
-}) {
-  const ref = useRef();
-  const { nodes } = useGLTF(glb);
-  const buffer = useFBO();
-  const { viewport: vp } = useThree();
-  const [scene] = useState(() => new THREE.Scene());
-  const geoWidthRef = useRef(1);
-
-  useEffect(() => {
-    const geo = nodes[geometryKey]?.geometry;
-    if (geo) {
-      geo.computeBoundingBox();
-      geoWidthRef.current = geo.boundingBox.max.x - geo.boundingBox.min.x || 1;
-    }
-  }, [nodes, geometryKey]);
-
-  useFrame((state, delta) => {
-    const { gl, viewport, pointer, camera } = state;
-    const v = viewport.getCurrentViewport(camera, [0, 0, 15]);
-
-    const destX = followPointer ? (pointer.x * v.width) / 2 : 0;
-    const destY = lockToBottom ? -v.height / 2 + 0.2 : followPointer ? (pointer.y * v.height) / 2 : 0;
-    
-    if (ref.current) {
-      easing.damp3(ref.current.position, [destX, destY, 15], 0.15, delta);
-      if (modeProps.scale == null) {
-        const maxWorld = v.width * 0.9;
-        const desired = maxWorld / geoWidthRef.current;
-        ref.current.scale.setScalar(Math.min(0.24, desired));
-      }
-    }
-
-    gl.setRenderTarget(buffer);
-    gl.render(scene, camera);
-    gl.setRenderTarget(null);
-    gl.setClearColor(0x000000, 0); 
-  });
-
-  const { scale, ior, thickness, anisotropy, chromaticAberration, ...extraMat } = modeProps;
-
-  return (
-    <>
-      {createPortal(
-        <group>
-          {/* Subtitle */}
-          <Text
-            position={[0, 2.2, 12]}
-            fontSize={0.09}
-            font="/fonts/GeistMono-Bold.woff" // Optional: custom path or standard fallback
-            letterSpacing={0.4}
-            color="#22d3ee"
-            anchorX="center"
-            anchorY="middle"
-          >
-            UI/UX DESIGNER • FRONTEND DEVELOPER
-          </Text>
-
-          {/* Main Typography Header Lines */}
-          <Text
-            position={[0, 0.7, 12]}
-            fontSize={0.75}
-            fontWeight={900}
-            letterSpacing={-0.05}
-            color="white"
-            anchorX="center"
-            anchorY="middle"
-          >
-            ATHARVA
-          </Text>
-          <Text
-            position={[0, -0.6, 12]}
-            fontSize={0.75}
-            fontWeight={900}
-            letterSpacing={-0.05}
-            color="white"
-            anchorX="center"
-            anchorY="middle"
-          >
-            BULBULE
-          </Text>
-
-          {/* Paragraph Tagline */}
-          <Text
-            position={[0, -1.6, 12]}
-            fontSize={0.11}
-            maxWidth={4.0}
-            textAlign="center"
-            color="#d4d4d8"
-            anchorX="center"
-            anchorY="middle"
-          >
-            Crafting cinematic digital experiences through design, code, and visual storytelling.
-          </Text>
-        </group>,
-        scene
-      )}
-      
-      <mesh scale={[vp.width, vp.height, 1]}>
-        <planeGeometry />
-        <meshBasicMaterial map={buffer.texture} transparent />
-      </mesh>
-      
-      {nodes[geometryKey] && (
-        <mesh ref={ref} scale={scale ?? 0.24} rotation-x={Math.PI / 2} geometry={nodes[geometryKey]?.geometry} {...props}>
-          <MeshTransmissionMaterial
-            buffer={buffer.texture}
-            ior={ior ?? 1.25}
-            thickness={thickness ?? 5}
-            anisotropy={anisotropy ?? 0.02}
-            chromaticAberration={chromaticAberration ?? 0.15}
-            transmission={1.0}
-            roughness={0.0}
-            transparent
-            {...extraMat}
-          />
-        </mesh>
-      )}
-    </>
-  );
-});
-
-function Lens({ modeProps, ...p }) { return <ModeWrapper glb="/assets/3d/lens.glb" geometryKey="Cylinder" followPointer modeProps={modeProps} {...p} />; }
-function Cube({ modeProps, ...p }) { return <ModeWrapper glb="/assets/3d/cube.glb" geometryKey="Cube" followPointer modeProps={modeProps} {...p} />; }
-function Bar({ modeProps = {}, ...p }) { return <ModeWrapper glb="/assets/3d/bar.glb" geometryKey="Cube" lockToBottom followPointer={false} modeProps={modeProps} {...p} />; }
