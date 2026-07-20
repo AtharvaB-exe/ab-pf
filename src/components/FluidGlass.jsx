@@ -2,23 +2,20 @@
 import * as THREE from 'three';
 import { useRef, useState, useEffect, memo } from 'react';
 import { Canvas, createPortal, useFrame, useThree } from '@react-three/fiber';
-import { useFBO, useGLTF, Preload, MeshTransmissionMaterial } from '@react-three/drei';
+import { useFBO, useGLTF, Preload, MeshTransmissionMaterial, Text } from '@react-three/drei';
 import { easing } from 'maath';
 
-export default function FluidGlass({ mode = 'lens', lensProps = {}, children }) {
+export default function FluidGlass({ mode = 'lens', lensProps = {} }) {
   const Wrapper = mode === 'cube' ? Cube : mode === 'bar' ? Bar : Lens;
   return (
     <Canvas camera={{ position: [0, 0, 20], fov: 15 }} gl={{ alpha: true }}>
-      <Wrapper modeProps={lensProps}>
-        {children}
-      </Wrapper>
+      <Wrapper modeProps={lensProps} />
       <Preload />
     </Canvas>
   );
 }
 
 const ModeWrapper = memo(function ModeWrapper({
-  children,
   glb,
   geometryKey,
   lockToBottom = false,
@@ -53,39 +50,90 @@ const ModeWrapper = memo(function ModeWrapper({
       if (modeProps.scale == null) {
         const maxWorld = v.width * 0.9;
         const desired = maxWorld / geoWidthRef.current;
-        ref.current.scale.setScalar(Math.min(0.22, desired));
+        ref.current.scale.setScalar(Math.min(0.24, desired));
       }
     }
 
-    // Force rendering everything inside our texture portal scene into the distortion cache
     gl.setRenderTarget(buffer);
     gl.render(scene, camera);
     gl.setRenderTarget(null);
-    gl.setClearColor(0x000000, 0);
+    gl.setClearColor(0x000000, 0); 
   });
 
   const { scale, ior, thickness, anisotropy, chromaticAberration, ...extraMat } = modeProps;
 
   return (
     <>
-      {createPortal(children, scene)}
+      {createPortal(
+        <group>
+          {/* Subtitle */}
+          <Text
+            position={[0, 2.2, 12]}
+            fontSize={0.09}
+            font="/fonts/GeistMono-Bold.woff" // Optional: custom path or standard fallback
+            letterSpacing={0.4}
+            color="#22d3ee"
+            anchorX="center"
+            anchorY="middle"
+          >
+            UI/UX DESIGNER • FRONTEND DEVELOPER
+          </Text>
+
+          {/* Main Typography Header Lines */}
+          <Text
+            position={[0, 0.7, 12]}
+            fontSize={0.75}
+            fontWeight={900}
+            letterSpacing={-0.05}
+            color="white"
+            anchorX="center"
+            anchorY="middle"
+          >
+            ATHARVA
+          </Text>
+          <Text
+            position={[0, -0.6, 12]}
+            fontSize={0.75}
+            fontWeight={900}
+            letterSpacing={-0.05}
+            color="white"
+            anchorX="center"
+            anchorY="middle"
+          >
+            BULBULE
+          </Text>
+
+          {/* Paragraph Tagline */}
+          <Text
+            position={[0, -1.6, 12]}
+            fontSize={0.11}
+            maxWidth={4.0}
+            textAlign="center"
+            color="#d4d4d8"
+            anchorX="center"
+            anchorY="middle"
+          >
+            Crafting cinematic digital experiences through design, code, and visual storytelling.
+          </Text>
+        </group>,
+        scene
+      )}
+      
       <mesh scale={[vp.width, vp.height, 1]}>
         <planeGeometry />
         <meshBasicMaterial map={buffer.texture} transparent />
       </mesh>
+      
       {nodes[geometryKey] && (
-        <mesh ref={ref} scale={scale ?? 0.22} rotation-x={Math.PI / 2} geometry={nodes[geometryKey]?.geometry} {...props}>
+        <mesh ref={ref} scale={scale ?? 0.24} rotation-x={Math.PI / 2} geometry={nodes[geometryKey]?.geometry} {...props}>
           <MeshTransmissionMaterial
             buffer={buffer.texture}
             ior={ior ?? 1.25}
-            thickness={thickness ?? 6}
-            anisotropy={anisotropy ?? 0.05}
-            chromaticAberration={chromaticAberration ?? 0.2}
+            thickness={thickness ?? 5}
+            anisotropy={anisotropy ?? 0.02}
+            chromaticAberration={chromaticAberration ?? 0.15}
             transmission={1.0}
             roughness={0.0}
-            distortion={0.3}
-            distortionScale={0.5}
-            temporalDistortion={0.0}
             transparent
             {...extraMat}
           />
